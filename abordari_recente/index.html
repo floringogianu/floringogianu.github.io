@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en"> 
+  <head>
+    <meta charset="utf8">
+    <title>Aborări recente în învățarea prin recompensă | A presentation framework built on reveal.js</title>
+    <meta name="description" content="Abordări recente în învățarea prin recompensă">
+    <meta name="author" content="Tudor Berariu, Florin Gogianu">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+    <link rel="stylesheet" href="css/main.css">
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section data-background="img/galactic-neural-nets.jpg">
+          <h1>Abordări recente în învățarea prin recompensă</h1>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Plan</h3>
+          <ol>
+            <li>Foarte scurtă introducere:
+              <ul style="font-size:80%">
+                <li>Formularea problemei în învățarea prin recompensă.</li>
+                <li>Procese Markov Decizionale.</li>
+                <li>Funcții de utilitate.</li>
+                <li>Q-learning.</li>
+              </ul>
+            </li>
+            <li>Îmbunătățirea estimatorilor $Q(s,a)$.</li>
+            <li>Scalabilitate. Introducere în metode bazate pe gradient.</li>
+            <!--li Învățarea de modele ale mediului. Formalismul AIXI.-->
+          </ol>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">Introducere. Problema învățării prin recompensă.</h3>
+          <ul style="font-size:80%">
+            <li class="fragment">Un agent interactionează cu un mediu necunoscut.</li>
+            <li class="fragment">La fiecare pas execută o acțiune și primește o recompensă.</li>
+            <li class="fragment"><span class="emph">Problema învățării prin recompensă</span> este construirea unui agent care, în timp, să primească o recompensă cât mai mare.</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">Introducere. Elemente (I).</h3>
+          <ul style="font-size:80%">
+            <li class="fragment"><span class="emph">Recompensă</span> $r_t$. Semnal scalar care indică performanța agentului la momentul $t$.</li>
+            <li class="fragment"><span class="emph">Acțiune</span> $a_t$. Acțiunea luată de agent la momentul $t$ confom unei:
+              <ul style="font-size:80%">
+                <li class="fragment">distribuții deterministe $a_t = \pi(s_t)$.</li>
+                <li class="fragment">distribuții stocastice $a_t \sim \pi(a_t | s_t)$.</li>
+              </ul>
+            </li>
+            <li class="fragment"><span class="emph">Observație</span> $o_t$. Starea observabilă a mediului la momentul $t$.</li>
+            <li class="fragment"><span class="emph">Stare</span> $s_t$. Starea folosită de agent pentru a lua o acțiune.</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">Introducere. Elemente (II).</h3>
+          <ul style="font-size:80%">
+            <li class="fragment"><span class="emph">Obiectiv:</span> Maximizarea recompensei cumulată primită pe termen lung.</li>
+            <li class="fragment"><span class="emph">Recompensă viitoare:</span> $G_t = r_{t+1} + r_{t+2} + ... + r_{T}$.</li>
+            <li class="fragment"><span class="emph">Recompensă atenuată:</span> $G_t = r_{t+1} + \gamma r_{t+2} + \gamma^2 r_{t+3} + ... + \gamma^{T-1} r_{T}$.</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">Introducere. Procese Markov Decizionale.</h3>
+          <ul style="font-size:80%">
+            <li class="fragment">Un <span class="emph">MDP</span> este definit de $(S,A,P)$
+              <ul style="font-size:80%">
+                <li class="fragment">$S$ este spațiul stărilor.</li>
+                <li class="fragment">$A$ este spațiul acțiunilor.</li>
+                <li class="fragment">$P(r,s' | s,a)$ este distribuția de probabilitate a tranzițiilor și a recompenselor.</li>
+              </ul>
+            </li>
+            <li class="fragment">Toate stările au <span class="emph">proprietatea Markov</span>: $P(s' | s_t) = P(s' | s_0, ... s_t)$</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">Introducere. Funcții de utilitate.</h3>
+          <ul style="font-size:80%">
+            <li class="fragment"><span class="emph">Funcția valoare.</span> Măsoară utilitatea unei stări, estimează recompensa viitoare.
+              $$\begin{aligned}
+              V^{\pi}(s)
+              & = \mathbb E_{\pi} [r_{t+1} + \gamma r_{t+2} + \gamma^2 r_{t+3} + ... + \gamma^{T-1} r_{T} | s_t = s, \pi] \\
+              & = \mathbb E_{\pi} [r_{t+1} + \gamma V^{\pi}(s_{t + 1}) | s_t = s, \pi] \\
+              \end{aligned}$$
+            </li>
+            <li class="fragment"><span class="emph">Funcția valoare-acțiune.</span> Măsoară utilitatea unei stări condiționată de o acțiune.$$Q^{\pi}(s,a) = \mathbb E_{\pi} [r_{t+1} + \gamma r_{t+2} + \gamma^2 r_{t+3} + ... + \gamma^{T-1} r_{T} | s_t = s, a_t = a, \pi]$$</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">Introducere. Învățarea funcției de utilitate.</h3>
+          <ul style="font-size:80%">
+            <li class="fragment"><span class="emph">Metode Monte-Carlo</span>. Folosim recompensa cumulată de-a lungul unui episod $G_t$ ca țintă pentru $V(s)$$$V(s_t) \leftarrow V(s_t) + \alpha[G_t - V(s_t)]$$</li>
+            <li class="fragment"><span class="emph">Metode bazate pe diferența temporală</span>. Folosim valoarea estimată a stării următoare ca țintă pentru $V(s)$$$V(s_t) \leftarrow V(s_t) + \alpha[r_{t+1} + \gamma V(s_{t+1}) - V(s_t)]$$</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">Introducere. Q-learning (I).</h3>
+          <ul style="font-size:80%">
+            <li>Să presupunem că $Q^{\star}(s,a)$ există și este cunoscută. Cum generăm o politică?</li>
+            <li class="fragment">
+              Putem scrie recursiv funcția de utilitate:$$Q^{\star}(s,a) = \mathbb E[r_{t+1} + \gamma V^{\star}(s_{t+1})]$$</li>
+            <li class="fragment">
+              O politică optimă este luarea celei mai bune acțiuni la fiecare pas, $\pi(s) = \mathop{\arg\max}_a Q(s,a)$:$$Q^{\star}(s,a) = \mathbb E[r_{t+1} + \gamma \mathop{\arg\max}\limits_{a_{t+1}} Q^{\star}(s_{t+1},a_{t+1})]$$</li>
+          </ul>
+        </section>
+        <section class="left fragments" data-background="#FFF">
+          <h3 class="slide-title">Introducere. Q-learning (II).</h3>
+          <ul style="font-size:80%">
+            <li>Regula de actualizare:
+              $$Q(s_t, a_t) \leftarrow
+              Q(s_t, a_t) + \alpha[r_{t+1} + \gamma \mathop{\arg\max}\limits_{a_{t+1}} Q(s_{t+1},a_{t+1}) - Q(s_t, a_t)]$$
+            </li>
+            <li class="fragment">Generalized Policy Iteration:
+              <div style="padding-top: 30px"><img src="img/gpi.png" style="max-width: 39%; float: left; background-color: #FFF"><img src="img/gpi_convergence.png" style="width: 50%; float: right; background-color: #FFF"></div>
+            </li>
+          </ul>
+        </section>
+        <section class="left fragments" data-background="#FFF">
+          <h3 class="slide-title">Introducere. Abordări generale.<img src="img/approaches.png" style="background-color: #FFF"><small class="right" style="display:block; font-size: 1rem">John Schulmann</small></h3>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">1. Îmbunătățirea estimatorilor Q(s,a)</h3>
+          <ol>
+            <li>Supraevaluarea acțiunilor.<br><small><span class="cite">van Hasselt, 2015</span><span> - Deep Reinforcement Learning with Double Q-learning</span></small></li>
+            <li>Dezambiguizarea V(s,a) și Q(s,a).<br><small><span class="cite">Wang, 2015</span><span> - Dueling Network Architectures for Deep Reinforcement Learning</span></small></li>
+          </ol>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">1.1 Supraevaluarea acțiunilor. Cauze</h3>
+          <p>Supraevaluare a acțiunilor alese în detrimentul celorlalte acțiuni posibile cauzată de:</p>
+          <ul style="font-size: 80%">
+            <li class="fragment">Erori aleatoare de estimare, inevitabile la începutul antrenării.</li>
+            <li class="fragment">Operatorul $max$ este deplasat pozitiv.</li>
+            <li class="fragment">Inexpresibilitatea estimatorului.</li>
+            <li class="fragment">Non-staționaritatea mediului.</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">1.1 Supraevaluarea acțiunilor. Zgomot</h3>
+          <p>Să presupunem că estimatorul Q(s,a) este corupt de zgomot cu medie 0.</p><img src="img/ddqn_noise.png" style="display: block; float: clear; background-color: #FFF">
+          <p></p>
+          <p class="right fragment"><small>(Thrun, Scwartz, 1992)</small></p>
+        </section>
+        <!--section.left.fragments
+        //h3.slide-title 1.1 Supraevaluarea acțiunilor. Limite
+        //p.cond Fie $Q_\ast(s,a) = V_\ast(s)$ și $Q_t$ astfel încât $\sum_a(Q_t(s,a) - V_\ast(s)) = 0$. În aceste condiții:
+        //ul
+           //li.fragment $\max_a Q_t(s,a) \ge V_\ast(s) + \sqrt{\frac{C}{m-1}}$, pentru $C = \frac{1}{m} \sum_a(Q_t(s,a) - V_\ast(s))^2$
+           //li.fragment $\max_a Q_t(s,a) \le \gamma\epsilon\frac{m-1}{m+1}$, dacă erorile $Q_t(s,a) - V_\ast(s)$ sunt distribuite uniform în $[-\epsilon, \epsilon]$
+        
+        -->
+        <!--section.left.fragments
+        //h3.slide-title 1.1 Supraevaluarea acțiunilor. Model
+        //p Funcția de cost:
+        //ul
+           //li $\mathcal L(\theta_i) =  \mathbb E [(r + \gamma \max_{a^\prime} Q(s^\prime,a^\prime;\theta_i) - Q(s,a;\theta_i) )^2].$
+           //li.fragment Obținem o politică maximizând peste valorile lui $Q(s,a).$
+        
+        
+        -->
+        <section class="left fragments">
+          <h3 class="slide-title">1.1 Supraevaluarea acțiunilor. Model</h3>
+          <p>Actualizare:</p>
+          <ul>
+            <li>$\theta_{t+1} = \theta_t + \alpha(Y_t^Q - Q(s_t, a_t; \theta_t))\nabla_{\theta_t}Q(s_t,a_t;\theta_t).$</li>
+            <li>$Y_t^{\text{DQN}} \equiv r_{t+1} + \gamma \,\max\limits_{a} \, Q(s_{t+1}, a; \theta_t^-).$</li>
+            <li class="fragment">$Y_t^{doubleDQN} \equiv r_{t+1} + \gamma \, Q(s_{t+1}, \mathop{\arg\,\max}\limits_{a} Q(s_{t+1}, a; \theta_t);\theta_t^\prime)$</li>
+            <li class="fragment">DQN este susceptibil la supraevaluare deoarece maximizează atât la selectarea cât și la evaluarea acțiunii.</li>
+            <li class="fragment">Double Q-learning evaluează tot acțiunea luată de politică, dar folosind $\theta_t^\prime$.</li>
+          </ul>
+        </section>
+        <!--section.left(data-background="#FFF")
+        //h3.slide-title 1.1 Experimente
+        //img(src="/img/ddqn_actions.png" style="max-width: 39%; float: left; background-color: #FFF")
+        //img(src="/img/ddqn_overestimation.png" style="max-width: 55%; float: right; background-color: #FFF")
+        
+        
+        -->
+        <section class="left" data-background="#FFF">
+          <h3 class="slide-title">1.1 Experimente</h3><img src="img/ddqn_estimates.png" style="max-width: 80%; background-color: #FFF">
+        </section>
+        <section class="left" data-background="#FFF">
+          <h3 class="slide-title">1.1 Rezultate</h3><img src="img/ddqn_scores.png" style="background-color: #FFF">
+        </section>
+        <section class="left">
+          <h3 class="slide-title">1.2 Dueling Network Architectures for Deep Reinforcement Learning</h3>
+          <p><span class="cite">Wang, 2015</span></p>
+        </section>
+        <section class="left fragments" data-background="#FFF">
+          <h3 class="slide-title">1.2 Dezambiguizarea Q(s,a) de V(s)</h3><img src="img/dueling_saliency.png" style="max-width: 43%; background-color: #FFF">
+          <div style="float: right; max-width: 55%">
+            <ul style="font-size:80%">
+              <li>Observă că există stări cu valori Q(s,a) foarte apropiate...</li>
+              <li class="fragment">... și că nu este necesară estimarea valorii fiecărei acțiuni.</li>
+              <li class="fragment">Dueling DQN învață $V(s)$, fără să fie nevoită să învețe efectul fiecărei acțiuni în starea respectivă.</li>
+            </ul>
+          </div>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">1.2 Dezambiguizarea Q(s,a) de V(s)</h3>
+          <p>Putem deriva două cantități în relație cu $Q^{\pi}(s,a) = \mathbb E\,[R_t | s_t = s, a_t = a, \pi]$:</p>
+          <ul>
+            <li class="fragment">Utilitatea unei stări:<br><span class="cf">$V^{\pi}(s) = \mathbb E_{a \sim \pi(s)} \,[Q^{\pi}(s,a)]$</span></li>
+            <li class="fragment">Importanța acțiunilor relativ de $V(s)$:<br><span class="cf">$A^{\pi}(s,a) = Q^{\pi}(s,a) - V^{\pi}(s)$</span></li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">1.2 Dezambiguizarea Q(s,a) de V(s)</h3>
+          <p>Pentru fiecare stare, urmând acțiuni conform politicii:</p>
+          <ul>
+            <li class="fragment">$V^\pi(s)$ este valoarea totală a recompensei așteptată din pasul respectiv.</li>
+            <li class="fragment">$A^\pi(s,a)$ este măsura în care alegerea acțiunii $a$ relativ la celelalte acțiuni duce la obținerea recompensei așteptate.</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">1.2 Dezambiguizarea Q(s,a) de V(s)</h3>
+          <p>După convergența la politica optimă:</p>
+          <ul>
+            <li class="fragment">$V^\pi(s)$ este valoarea adevărată a stării $s$.</li>
+            <li class="fragment">$A^\pi(s,a) = 0$ pentru acțiunea optimă $a$</li>
+          </ul>
+        </section>
+        <section class="left fragments" data-background="#FFF">
+          <h3 class="slide-title">1.2 Model. Functia de cost</h3><img src="img/dueling_dqn.png" style="max-width: 33%; background-color: #FFF">
+          <div style="float: right; width: 60%">
+            <p style="font-size: 80%">Naiv: $Q(s,a; \theta, \alpha, \beta) = V(s;\theta, \beta) + A(s,a;\theta, \alpha)$</p>
+            <p class="fragment" style="font-size: 80%">Însă dat fiind $Q$ nu putem afla $A$ și $V$ unice.</p>
+          </div>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">1.2 Model. Functia de cost</h3>
+          <p>Soluția este să forțăm $A(s,a)$ să fie 0 pentru acțiunea luată:<span class="cf">$Q(s,a; \theta, \alpha, \beta) = V(s;\theta, \beta) + (A(s,a;\theta, \alpha) - \mathop{\max}\limits_{a'\in |\mathcal A|} A(s,a';\theta, \alpha))$</span></p>
+          <p class="fragment emph">În practică:<span class="cf">$Q(s,a; \theta, \alpha, \beta) = V(s;\theta, \beta) + (A(s,a;\theta, \alpha) - \frac{1}{|\mathcal A|}\Sigma_{a'}A(s,a';\theta, \alpha))$</span></p>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">1.2 Model. Avantaje</h3>
+          <ul>
+            <li>Convergență mai rapidă deoarece $V(s)$ este actualizat la fiecare pas.</li>
+            <li>Performanță mai mare cu creșterea numărului de acțiuni.</li>
+            <li>Discriminare mai bună între acțiuni.</li>
+          </ul>
+        </section>
+        <section class="left fragments" data-background="#FFF">
+          <h3 class="slide-title">1.2 Rezultate</h3><img src="img/dueling_score.png" style="background-color: #FFF">
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">2. Scalabilitate</h3>
+          <ul>
+            <li><span class="cite">Mnih, 2016</span><span>- Asynchronous Methods for Deep Reinforcement Learning</span></li>
+            <li class="fragment">Nevoia de paralelizare pentru obiective mai complexe</li>
+            <li class="fragment">Extinderea la algortimi on-policy: Sarsa, metode în n-pași, actor-critic.</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">2. On vs Off policy</h3>
+          <ul style="font-size:80%">
+            <li><span class="emph">off-policy</span><span> - realizează pasul de actualizare maximizând valoarea stării următoare. Estimează recompensa așteptată cu o politică de maximizare peste acțiuni, alta decât cea urmată ($\epsilon-\text{greedy}$).</span></li>
+            <li><span class="emph">on-policy</span><span> - realizează pasul de actualizare folosind valoarea Q a stării următoare conform politicii urmate. Estimează recompensa așteptată presupunând că politica actuală continuă să fie urmată.</span></li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">2. Gradientul valorii așteptate</h3>
+          <p style="font-size: 60%">În general, dacă $f(x)$ este funcția de scor sub o distribuție parametrizată $p(x | \theta)$, putem obține astfel gradientul valorii așteptate:</p>
+          <p style="font-size: 60%">
+            $$\begin{aligned}
+            \nabla_{\theta} \mathbb E_{x \sim p(x \mid \theta)} [f(x)]
+            &= \nabla_{\theta} \sum_x p(x \mid \theta) f(x) & \text{definiția valorii așteptate} \\
+            & = \sum_x \nabla_{\theta} p(x \mid \theta) f(x) & \\
+            & = \sum_x p(x \mid \theta) \frac{\nabla_{\theta} p(x \mid \theta)}{p(x \mid \theta)} f(x) \\
+            & = \sum_x p(x \mid \theta) \nabla_{\theta} \log p(x \mid \theta) f(x) & \text{log-trick: } \nabla_{\theta} \log(z) = \frac{1}{z} \nabla_{\theta} z \\
+             & = \mathbb E_x[f(x) \nabla_{\theta} \log p(x \mid \theta) ] & \text{valoare așteptată}
+            \end{aligned}$$
+          </p>
+        </section>
+        <section class="left" data-background="#FFF">
+          <h3 class="slide-title">2. Gradientul valorii așteptate. Intuiții</h3><img src="img/pg_intuition.png" style="max-width: 55%; background-color: #FFF">
+        </section>
+        <section class="left" data-background="#FFF">
+          <h3 class="slide-title">2. Gradientul valorii așteptate. Exemplu REINFORCE</h3><img src="img/pg_monte-carlo.png" style="background-color: #FFF">
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">2. Problema varianței.</h3>
+          <ul style="font-size:80%">
+            <li>Dacă $f(x) \ge 0, \forall x_i$, actualizarea parametrilor pe baza gradientului va crește densitatea de probablitate pentru orice $x_i$</li>
+            <li class="fragment">Putem însă extrage o funcție etalon:
+              <p class="cf">
+                $$ \begin{aligned}
+                \nabla_{\theta} \mathbb E_{x \sim p(x \mid \theta)} [f(x)]
+                  &=\nabla_{\theta} \mathbb E_x [f(x) - b] \\
+                  & = \mathbb E_x[\nabla_{\theta} \log p(x) (f(x)-b)]
+                \end{aligned} $$
+              </p>
+            </li>
+            <li class="fragment">Un candidat natural pentru acest etalon este <span class="emph">funcția avantaj</span>.</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">2. Actor-Critic</h3>
+          <ul style="font-size:80%">
+            <li>$f(x)$ este o estimare a recompensei viitoare sau un eșantion.</li>
+            <li>$p(x|\theta)$ este un model pentru politica agentului $\pi(s,a | \theta).$</li>
+            <li class="fragment">când $f(x)$ estimează utilitatea unei perechi stare-acțiune spunem că folosim un <span class="emph">critic</span> pentru actualizarea politicii.</li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">2. Actor-Critic</h3>
+          <p>Aceste metode țin două seturi de parametri:</p>
+          <ul style="font-size:80%">
+            <li><span class="emph">Criticul</span> actualizează parametrii $\theta_v$</li>
+            <li><span class="emph">Actorul</span> actualizează parametrii politicii $\theta$, în direcția sugerată de critic.</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">2. Metode în n-pași</h3>
+          <ul style="font-size:80%">
+            <li>Se folosesc de întreaga traiectorie episodică pentru actualizarea politicii și a funcției de utilitate a perechii stare-acțiune.</li>
+            <li class="fragment">Actualizează $Q(s,a)$ către recompensa degradată $R_t = r_t + \gamma r^{t+1} + \gamma^{n-1}r_{t+n-1} + \max_a \gamma^n Q(s_{t+n}, a_{t+n})$</li>
+            <li class="fragment">... distribuind recompensa pe toată întinderea unei traiectorii.</li>
+          </ul>
+        </section>
+        <section class="left" data-background="#FFF">
+          <h3 class="slide-title">2. Algoritmul A3C</h3><img src="img/a3c_algo.png" style="max-width: 70%; float: left; background-color: #FFF">
+        </section>
+        <section class="left fragments">
+          <h3 class="slide-title">2. „Advantage Actor-Critic”</h3>
+          <p style="font-size:80%">
+            Combinând funcția avantaj cu metoda n-pași, actualizarea parametrilor politicii poate fi văzută astfel:$$\nabla_\theta log \pi(a_t | s_t, \theta) A(s_t, a_t | \theta, \theta_v), $$</p>
+          <p style="font-size:80%">
+            unde $A(s_t, a_t | \theta, \theta_v)$ este estimarea funcției avantaj dată de:$$\sum_{i=0}^{k-1} \gamma^i r_{t+1} + \gamma^k V(s_{t+k} ; \theta_v) - V(s_t; \theta) $$</p>
+        </section>
+        <section class="left" data-background="#FFF">
+          <h3 class="slide-title">2. Rezultate</h3><img src="img/a3c_results.png" style="max-width: 100%; float: left; background-color: #FFF">
+        </section>
+        <section class="left" data-background="#FFF">
+          <h3 class="slide-title">2. Rezultate</h3><img src="img/a3c_scores.png" style="max-width: 100%; float: left; background-color: #FFF">
+        </section>
+      </div>
+    </div>
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+    <!--script(src="http://downlink.nz/js/socket.io.js")-->
+    <!--script(src="http://downlink.nz/js/reveal-sync.js")-->
+    <script type="text/javascript">
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        slideNumber: true,
+      
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+      
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true },
+          { src: 'plugin/math/math.js', async: true },
+          { src: 'plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+  </body>
+</html>
