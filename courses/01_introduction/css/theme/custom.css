@@ -9,7 +9,7 @@ body {
 
 .reveal {
   font-family: "Raleway", "Roboto", "Arial", sans;
-  font-size: 40px;
+  font-size: 32px;
   font-weight: normal;
   color: #000; }
 
@@ -267,20 +267,29 @@ body {
 
 .reveal .slides {
   text-align: left; }
+  .reveal .slides.centered {
+    text-align: center; }
 
 .reveal .slides img {
   display: block;
   margin: 15px auto; }
+  .reveal .slides img.clean {
+    border: none;
+    background: none;
+    box-shadow: none; }
 
 .reveal a {
   line-height: 1.3em; }
 
-.reveal [data-background] h1,
-.reveal [data-background] h2,
-.reveal [data-background] h3,
-.reveal [data-background] h4,
-.reveal [data-background] h5,
-.reveal [data-background] h6 {
+.reveal p.small {
+  font-size: 24px; }
+
+.reveal [data-background] h1, .reveal [data-background-color] h1,
+.reveal [data-background] h2, .reveal [data-background-color] h2,
+.reveal [data-background] h3, .reveal [data-background-color] h3,
+.reveal [data-background] h4, .reveal [data-background-color] h4,
+.reveal [data-background] h5, .reveal [data-background-color] h5,
+.reveal [data-background] h6, .reveal [data-background-color] h6 {
   color: #f4d018; }
 
 .alert {

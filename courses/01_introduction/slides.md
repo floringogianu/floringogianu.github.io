@@ -1,6 +1,8 @@
 <!-- .slide: data-background="./img/blue_galactic_neural_nets.jpg" -->
 <h2 class="title">Introduction to Reinforcement Learning</h2>
 
+Rémi Munos
+
 
 
 ### Contents
@@ -114,6 +116,7 @@ By contrast, RL differes in that:
 - Data center energy optimization
 - Dialogue systems
 - [RL for Real Life ICML workshop](https://sites.google.com/view/RL4RealLife#h.p_E8GavvJ-X7nT)
+- Robotics?
 
 
 
@@ -317,7 +320,7 @@ $$`
 
 ### One-step Temporal Difference
 
-<img src="./img/monte_carlo.png" alt="Monte Carlo" width="600px">
+<img src="./img/one_step_td.png" alt="Monte Carlo" width="600px">
 
 `$$
 V(s_t) \leftarrow V(s_t) + \alpha[r_{t+1} + \gamma V(s_{t+1}) - V(s_t)]
@@ -363,6 +366,28 @@ $$
 \end{aligned}
 $$
 </small>
+
+
+
+<!-- .slide: .centered data-background-color="#0f132d" -->
+<h2 class="title">So, is RL done?</h2>
+
+
+
+### The rest of the course
+
+<br>
+Take a linear approximator:
+
+`$$
+\hat{v}(s, \mathbf{w}) \doteq \mathbf{w}^{\top} \Phi(s) \doteq \sum_{i=1}^{d} w_{i} \phi_{i}(s)
+$$`
+
+compose it with some <span class="alert">non-linear</span> feature extractor $\Phi(s)$
+
+
+
+<!-- .slide: data-background-color="#fff" data-background="./img/landscape.png" data-background-size="40%" -->
 
 
 
