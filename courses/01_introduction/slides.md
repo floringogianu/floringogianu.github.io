@@ -1,8 +1,6 @@
 <!-- .slide: data-background="./img/blue_galactic_neural_nets.jpg" -->
 <h2 class="title">Introduction to Reinforcement Learning</h2>
 
-Rémi Munos
-
 
 
 ### Contents
