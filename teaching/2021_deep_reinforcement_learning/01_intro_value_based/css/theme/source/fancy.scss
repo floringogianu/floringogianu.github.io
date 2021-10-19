@@ -1,0 +1,170 @@
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+// Include theme-specific fonts
+// @import url(../../lib/font/league-gothic/league-gothic.css);
+@import url(https://fonts.googleapis.com/css?family=Oswald|Raleway:400,400i&display=swap);
+
+// Override theme settings (see ../template/settings.scss)
+$mainFontSize: 28px;
+$heading1Size: 2.488em;
+$heading2Size: 2.074em;
+$heading3Size: 1.728em;
+$heading4Size: 1.44em;
+
+$mainFont: "Raleway", "Roboto", "Arial", sans-serif;
+$headingFont: "Oswald", sans-serif;
+$headingTextShadow: none;
+$headingTextTransform: none;
+$mainColor: #000;
+$alertColor: #bd1421;
+$headingColor: #383d3d;
+$backgroundColor: #f0f0f0;
+$secondaryBackgroundColor: darken($backgroundColor, 20%);
+$linkColor: $alertColor;
+$linkColorHover: lighten($linkColor, 20%);
+$selectionBackgroundColor: $alertColor;
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------
+
+.reveal .slides .grid2x {
+  margin: 50px auto 50px auto;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  img {
+    margin: 0 10px;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+.reveal .grid2x2 {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 90%;
+  margin: 0 auto;
+  &.half {max-width: 60%;}
+
+  .grid-item {
+    width: 50%;
+    img {
+      margin: 20px;
+      width: calc(100% - (20px * 2));
+    }
+  }
+}
+
+.reveal .backgrounds iframe {
+  -webkit-transform: scale(0.75) translate(-16%, -16%);
+  -moz-transform: scale(0.75) translate(-16%, -16%);
+  transform: scale(0.75) translate(-16%, -16%);
+  min-width: 150%;
+  min-height: 150%;
+}
+
+.reveal .slides {
+  text-align: left;
+
+  &.centered {
+    text-align: center;
+  }
+  .centered {
+    text-align: center;
+  }
+}
+
+.reveal .slides img {
+  display: block;
+  margin: 50px auto 50px auto;
+  border: 10px solid #d2d2d2;
+
+  &.clean {
+    border: none;
+    background: none;
+    box-shadow: none;
+  }
+}
+
+.reveal a {
+  line-height: 1.3em;
+  text-decoration: underline;
+  font-style: italic;
+}
+
+.reveal .small {
+  font-size: 24px;
+}
+
+.reveal .has-dark-background h1,
+.reveal .has-dark-background h2,
+.reveal .has-dark-background h3,
+.reveal .has-dark-background h4,
+.reveal .has-dark-background h5,
+.reveal .has-dark-background h6 {
+  color: #f4d018;
+}
+
+.reveal .has-dark-background {
+  color: $backgroundColor;
+}
+
+.alert {
+  font-weight: 600px;
+  font-style: italic;
+  color: $alertColor;
+  // font-family: $headingFont;
+}
+
+.cite {
+  display: block;
+  float: right;
+}
+
+.reveal blockquote {
+  border: none;
+  box-shadow: none;
+  border-left: 10px solid $secondaryBackgroundColor;
+  margin: 40px 0;
+  padding: 0 0 0 20px;
+  > p {
+    margin: 0;
+  }
+}
+
+.grid {
+  /* Grid Fallback */
+  display: flex;
+  flex-wrap: wrap;
+
+  /* Supports Grid */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  grid-auto-rows: minmax(150px, auto);
+  grid-gap: 1em;
+}
+
+.grid_item {
+  /* Demo-Specific Styles */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  //   height: 200px;
+
+  /* Flex Fallback */
+  margin-left: 5px;
+  margin-right: 5px;
+  flex: 1 1 200px;
+}
+
+/* If Grid is supported, remove the margin we set for the fallback */
+@supports (display: grid) {
+  .grid_item {
+    margin: 0;
+  }
+}
