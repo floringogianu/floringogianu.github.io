@@ -535,7 +535,7 @@ Policy + Baseline. Clever $R(s)$ function.
             <li>Maximum Q-value</li>
             <li>TD-error</li>
             <li>Gradient magnitude</li>
-            <li>Entropy, auxiliarry losses</li>
+            <li>Entropy, auxiliary losses</li>
             <li>Episodic return, reward / step</li>
             <li>Mean steps / episode</li>
             <li>FPS rate</li>
@@ -543,7 +543,7 @@ Policy + Baseline. Clever $R(s)$ function.
         </ul>
         </li>
         <li class="fragment">Always have a <span class="alert">distinct evaluation routine</span> that runs a couple hundred eval episodes.</li>
-        <li class="fragment">A good ideea is to also keep a <span class="alert">cache o evaluation episodes</span>.</li>
+        <li class="fragment">A good idea is to also keep a <span class="alert">cache of evaluation episodes</span>.</li>
         <li class="fragment">Start small, find the simplest env that illustrates the problem.</li>
         <li class="fragment">At least three seeds or go home.</li>
         <li class="fragment">Log everything, question everything.</li>
