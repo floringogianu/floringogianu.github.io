@@ -1,0 +1,321 @@
+/**
+ * White theme for reveal.js. This is the opposite of the 'black' theme.
+ *
+ * By Hakim El Hattab, http://hakim.se
+ */
+
+
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+// Include theme-specific fonts
+@import url('https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&family=Fira+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+
+$blackBit: #100C08;
+$whiteBit: #EDEBEB;
+$blueBit: #006EFF;
+$lustBit: #E6212B;
+$marigoldBit: #F3A712;
+$purpleBit: #98319B;
+$cyanBit: #00B2CB;
+$darkGreyBit: #12161E;
+$seaGreen: #3CB371;
+$redBit: #FF0000;
+
+// Override theme settings (see ../template/settings.scss)
+$backgroundColor: $whiteBit;
+
+$mainColor: $blackBit;
+$headingColor: $blackBit;
+
+// Super important. This is the baseline of the entire typesystem
+$mainFontSize: 28px;
+$blockMargin: 20px;
+$slideHeight: 800px;  // same as in reveal.init()
+
+// Typography
+$mainFont: 'Fira Sans', Helvetica, sans-serif;
+$mainFontWeight: 300;
+
+$headingFont: 'Fira Sans', Helvetica, sans-serif;
+$heading1Size: 2.5em;
+$heading2Size: 1.6em;
+$heading3Size: 1.3em;
+$heading4Size: 1.0em;
+$headingFontWeight: 400;
+
+$altFont: 'Fira Mono';
+$altFontWeight: 400;
+
+$headingMargin: $blockMargin 0 $blockMargin 0;
+$headingTextShadow: none;
+$headingLetterSpacing: normal;
+$headingTextTransform: none;
+$linkColor: $blueBit;
+$linkColorHover: lighten($linkColor, 15%);
+$selectionBackgroundColor: lighten($linkColor, 25%);
+
+$alertColor: $blueBit;
+
+// Change text colors against dark slide backgrounds
+@include dark-bg-text-color($whiteBit);
+
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------
+
+// Override the theme
+
+
+// Typography
+.reveal {
+  font-weight: $mainFontWeight;
+}
+
+.reveal .slides .caption {
+  font-size: 0.9em;
+  text-align: center;
+  padding: 1em 4em 0 4em;
+}
+
+.emph {
+  font-weight: $headingFontWeight;
+}
+
+.reveal .slides .textsc {
+  font-family: $altFont;
+}
+
+.reveal .slides .small {
+  font-size: 0.6em;
+}
+
+.reveal .slides section .task {
+  font-family: $altFont;
+  font-weight: $altFontWeight;
+  font-size: 0.8em;
+  border-top: 1px solid $darkGreyBit;
+
+  span {
+    display: block;
+  }
+  .answer {
+    font-weight: 700;
+  }
+}
+
+.reveal ol>li,
+.reveal ul>li {
+  margin-bottom: 0.4em;
+}
+
+.reveal ol,
+.reveal ul {
+  padding-left: 2em;
+  display: block;
+}
+
+span.cite {
+  font-size: 0.6em;
+}
+
+
+
+// Layout
+
+.reveal .slides section.align-left {
+  text-align: left;
+}
+
+.reveal.slide .slides>section.beamer,
+.reveal.slide .slides>section.beamer>section {
+  min-height: calc($slideHeight - calc($blockMargin + $heading1Size)) !important;
+  padding-top: calc($blockMargin + $heading1Size);
+  display: flex !important;
+  position: absolute !important;
+  top: 0 !important;
+  align-items: baseline;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+section.beamer>h1,
+section.beamer>h2 {
+  position: absolute !important;
+  top: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  // text-align: center !important;
+}
+
+// rstack
+.reveal .r-stack.full {
+
+  width: 100%;
+}
+
+
+// Images
+.reveal .r-stack img {
+  margin: auto;
+  display: block;
+}
+
+.reveal img.center {
+  margin: $blockMargin auto;
+}
+
+// .print-pdf .reveal.slide .slides>section,
+// .print-pdf .reveal.slide .slides>section>section {
+//   min-height: 770px !important;
+//   position: relative !important;
+// }
+
+// Logo
+
+body.reveal-viewport {
+  background-image: url(../../img/bitdefender_logo_bw.png);
+  background-size: 56px;
+  background-repeat: no-repeat;
+  background-position: 96% 3%;
+}
+
+// Iframe fix?
+.reveal .slides section iframe {
+  width: 75%;
+  height: $slideHeight;
+}
+
+
+// Colors
+
+.alert {
+  font-style: italic;
+  color: $alertColor;
+  font-weight: $headingFontWeight;
+  // font-family: $headingFont;
+}
+
+.lustBit {
+  color: $lustBit;
+}
+
+.goldBit {
+  color: $marigoldBit;
+}
+
+.greenBit {
+  color: $seaGreen;
+}
+
+.marigoldBit {
+  color: $marigoldBit;
+}
+
+.purpleBit {
+  color: $purpleBit;
+}
+
+// Grids
+
+.reveal .grid {
+  width: 100%;
+  display: grid;
+  grid-gap: 1em;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  // grid-auto-rows: minmax(150px, auto);
+
+  &.align-items--end {
+    align-items: end;
+  }
+}
+
+.reveal .grid img {
+  margin: auto;
+  display: block;
+}
+
+
+// Helpers
+
+.reveal .slides .placeholder {
+  display: block;
+  min-width: 50%;
+  min-height: 20vh;
+  margin: 0 auto;
+  background-color: #FFF;
+  border: 1px solid #9b9790;
+  padding: 5em 2em;
+  font-size: 16px;
+  text-align: center;
+}
+
+
+
+// .reveal .slides section:not(.standout) {
+//   text-align: left;
+//   width: 100%;
+//   height: 100%;
+// }
+
+// // Centering
+// .reveal .slides section .center,
+// .reveal .slides section .vcenter {
+//   margin: auto;
+//   position: absolute;
+//   top: 50%;
+//   left: 0%;
+//   transform: translate(0%, -50%);
+// }
+
+// .reveal .slides section .center,
+// .reveal .slides section .hcenter {
+//   text-align: center;
+//   width: 100%;
+// }
+
+
+// Presentation title
+// .reveal .slides section h1 {
+  // text-transform: uppercase;
+// }
+
+// Slide title
+
+// .reveal .slides section.standout {
+
+//   h1,
+//   h2,
+//   h3,
+//   h4,
+//   h5,
+//   h6 {
+//     line-height: 1.6;
+//     // color: $backgroundColor;
+//   }
+// }
+
+// .reveal ol li li,
+// .reveal ul li li,
+// .reveal ul li ol,
+// .reveal ul li ul,
+// .reveal ol li ol,
+// .reveal ol li ul {
+//   margin-bottom: 0.4em;
+// }
+
+// .reveal ul li ol,
+// .reveal ul li ul,
+// .reveal ol li ol,
+// .reveal ol li ul {
+//   margin-top: 0.6em;
+// }
+
+// Plugins
