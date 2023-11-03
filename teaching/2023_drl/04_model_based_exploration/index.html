@@ -1,0 +1,560 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>reveal.js</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/rl.css">
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section id="title-slide" class="standout" data-background-color="#282a36">
+        <h1>Exploration in Deep RL</h1>
+        <!-- <p>Florin Gogianu</p> -->
+      </section>
+
+
+      <!-- <section>
+        <h2>Epsilon greedy exploration</h2>
+        <div class="vcenter hcenter">
+          <img width=70% src="./img/epsilon_greedy.svg" alt="epsilon_greedy">
+        </div>
+      </section> -->
+
+
+      <section data-markdown>
+        <textarea data-template>
+          ## Exploration vs. Exploitation
+          <br><br><br>
+
+          - Learning agents need to trade off:
+              - <span class="alert">Exploitation</span>: Maximise performance based on current knowledge
+              - <span class="alert">Exploration</span>: Gather more knowledge
+          - Agents need to gather information to make the best overall decisions
+          - The best long-term strategy likely involves short-term sacrifices
+          ---
+          ## Let's simplify things
+          <br>
+          <br>
+
+          Imagine an environment in which:
+
+          - there is one single state
+          - actions no longer have long-term consequences on the environment
+          - actions only impact immediate reward
+        </textarea>
+      </section>
+
+
+      <section>
+        <h2>Multi-armed bandit</h2>
+        <div class="vcenter hcenter">
+          <span class="fragment"></span>
+          <span class="fragment"></span>
+          <span class="fragment"></span>
+          <span class="fragment"></span>
+          <span class="fragment"></span>
+          <span class="fragment"></span>
+          <span class="fragment"></span>
+          <span class="fragment"></span>
+          <div class="c70" data-animate data-src="./img/bandit_actions.svg">
+            <!--
+          { "setup": [
+          { "element": ".t0", "modifier": "attr", "parameters": [ {"class": "fragment", "data-fragment-index": "0"} ] },
+          { "element": ".t1", "modifier": "attr", "parameters": [ {"class": "fragment", "data-fragment-index": "1"} ] },
+          { "element": ".t2", "modifier": "attr", "parameters": [ {"class": "fragment", "data-fragment-index": "2"} ] },
+          { "element": ".t3", "modifier": "attr", "parameters": [ {"class": "fragment", "data-fragment-index": "3"} ] },
+          { "element": ".t4", "modifier": "attr", "parameters": [ {"class": "fragment", "data-fragment-index": "4"} ] },
+          { "element": ".t5", "modifier": "attr", "parameters": [ {"class": "fragment", "data-fragment-index": "5"} ] },
+          { "element": ".t6", "modifier": "attr", "parameters": [ {"class": "fragment", "data-fragment-index": "6"} ] },
+          { "element": ".t7", "modifier": "attr", "parameters": [ {"class": "fragment", "data-fragment-index": "7"} ] }
+          ]}
+          -->
+          </div>
+        </div>
+      </section>
+
+
+      <section data-markdown>
+        <textarea data-template>
+        ## Multi-armed bandit
+
+        <div class="center">
+          <div class="r-stack">
+            <img src="img/oab.webp">
+            <img class="fragment" src="img/mab_octo0.jpg">
+            <img class="fragment" src="img/mab_octo1.png">
+            <img class="fragment" src="img/mab_octo3.png">
+            <img class="fragment" src="img/mab_octo2.png" width="60%">
+          </div>
+        </div>
+        ---
+        ## Multi-armed bandit
+        <br><br><br>
+
+        - A multi-armed bandit is a set of distributions $\\{\mathcal{R}_a \vert a \in \mathcal{A} \\}$
+        - $\mathcal{A}$ is a known set of actions (or "arms")
+        - $\mathcal{R}_a$ is a distribution on rewards, given action $a$
+        - At each step $t$ the agent selects an action $A_t \in \mathcal{A}$
+        - And receives a reward $R_t \sim \mathcal{R}_{A_t}$
+        
+        <br>
+        <br>
+
+        <p class="fragment"><span class="alert">Goal</span>: Maximise the cumulative reward $\sum_{i=1}^t R_i$</p>
+        ---
+        ## Multi-armed bandit. Values and Regret
+        <br><br><br>
+
+        - The <span class="alert">action-value</span> for action $a$ is the expected reward:
+        $$
+          q(a) = \mathbb{E} \left[ R_t \vert A_t = a \right]
+        $$
+        - The <span class="alert">optimal value</span> is
+        $$
+          v^{\ast} \\quad = \\quad \max_a q(a) \\quad = \\quad \max_a \mathbb{E} \left[ R_t \vert A_t = a \right]
+        $$
+        - <span class="alert">Regret</span> of action $a$ is
+        $$
+          \Delta_a = v^{\ast} - q(a)
+        $$
+        ---
+        ## Multi-armed bandit. Regret
+        <br><br><br>
+
+        We are interested in minimising the <span class="alert">total regret</span>:
+        $$
+          L_t = \sum_{n=1}^t v^{\ast} - q(A_n) = \sum_{n=1}^t \Delta_{A_n}
+        $$
+
+        <br>
+        <br>
+
+        - Maximise cumulative reward == minimize total regret
+        - The summation spans over the full "lifetime of the agent"
+        ---
+        ## Multi-armed bandit. Action values
+        <br><br><br>
+        
+        - The <span class="alert">action-value</span> for action a is the expected reward:
+        $$
+          q(a) = \mathbb{E} \left[ R_t \vert A_t = a \right]
+        $$
+        - A simple estimate is the average of the sampled rewards:
+        $$
+        Q_t(a) = \frac{\sum_{n=1}^t \mathbb{I}(A_n = a) R_n}{\sum_{n=1}^t \mathbb{I}(A_n = a)}
+        $$
+        - The count for action $a$ is:
+        $$
+        N_t(a) = \sum_{n=1}^t \mathbb{I}(A_n = a)
+        $$
+        ---
+        ## Multi-armed bandit. Action values
+        <br><br><br>
+
+        - Action values can be updated incrementally:
+        $$
+          Q_t(A_t) = Q_{t-1}(A_t) + \alpha_t(R_t - Q_{t-1}(A_t)),
+        $$
+        with
+        $$
+        a_t = \frac{1}{N_t(A_t)}  \\qquad \text{and} \\qquad N_t(A_t) = N_{t-1}(A_t) + 1
+        $$
+        ---
+        ## Multi-armed bandit. Algorithms
+        <br><br><br>
+
+        - <span class="alert">$\text{greedy}$</span>. Select action with highest value: $A_t = \argmax_a Q_t(a)$
+            - can get stuck in sub-optimal policies forever
+        - <span class="alert">$\epsilon\text{-greedy}$</span>. Select greedy action with probability $1-\epsilon$
+
+        <br>
+        <br>
+
+        <p class="fragment">Both $\text{greedy}$ and $\epsilon\text{-greedy}$ with constant $\epsilon$ have <span class="alert">linear total regret</span>.
+        </p>
+        ---
+        ## Optimism in face of uncertainty
+        <div class="center">
+          <div class="r-stack">
+            <img width="80%" src="./img/ofu0.png" alt="ofu0">
+            <img width="80%" src="./img/ofu1.png" alt="ofu1" class="fragment">
+            <img width="80%" src="./img/ofu2.png" alt="ofu2" class="fragment">
+            <img width="80%" src="./img/ofu3.png" alt="ofu3" class="fragment">
+            <img width="80%" src="./img/ofu4.png" alt="ofu4" class="fragment">
+            <img width="80%" src="./img/ofu5.png" alt="ofu5" class="fragment">
+            <img width="80%" src="./img/ofu6.png" alt="ofu6" class="fragment">
+            <img width="80%" src="./img/ofu7.png" alt="ofu7" class="fragment">
+          </div>
+        </div>
+        ---
+        ## Upper Confidence Bound (UCB)
+        <br><br>
+
+        <ul>
+          <li>Estimate an upper confidence $U_t(a)$ for each action value, such that: $q(a) \le Q_t(a) + U_t(a)$</li>
+          <li class="fragment">Select action maximizing <span class="alert">upper confidence bound</span>:
+          $$
+            a_t = \argmax_a Q_t(a) + U(a)
+          $$
+          </li>
+          <li class="fragment">The uncertainty should depend on the number of times N_t(a) action a has been selected
+          <ul>
+            <li class="fragment">small $N_t(a) \Longrightarrow$ large $U_t(a)$ (estimated value is uncertain)</li>
+            <li class="fragment">large $N_t(a) \Longrightarrow$ small $U_t(a)$ (estimated value is accurate)</li>
+          </ul>
+          </li>
+          <li class="fragment">Then $a$ is only selected if either
+            <ul>
+              <li>$Q_t(a)$ is large (the action is good)</li>
+              <li>$U_t(a)$ is large (the action is highly uncertain)</li>
+            </ul>
+          </li>
+        </ul>
+        ---
+        ## Upper Confidence Bound (UCB)
+        <br>
+
+        Pick a maximal desired probability $p$ so the true value does not exceed an upper bound: $p = e^{-2N_t(a) U_t(a)^2}$
+
+        And solve for this bound $U_t(a)$:
+        $$
+          U_t(a) = \sqrt{\frac{-\log p}{2N_t(a)}}
+        $$
+        <span class="alert">Intuition</span>: the probability that we will have a mean that is farther away from the sample mean than this bound is smaller than $p$.
+
+        <p class="fragment"><span class="alert">Idea</span>: reduce $p$ as we observe more rewards, e.g., $p=\frac{1}{t}$.
+        $$
+          U_t(a) = \sqrt{\frac{\log t}{2N_t(a)}}
+        $$
+        </p>
+        ---
+        ## Upper Confidence Bound (UCB)
+        <br>
+        <br>
+        In practice:
+        $$
+          a_t = \argmax_a Q_t(a) + c \; \sqrt{\frac{\log t}{N_t(a)}}
+        $$
+        where $c$ is a hyper-parameter.
+
+        <br>
+        <br>
+
+        <p class="fragment"><span class="alert">Theorem (Auer et al., 2002)</span>:
+        <br>
+        UCB with $c = \sqrt{2}$ and gaussian rewards achieves logarithmic expected total regret + some constant.
+        </p>
+        ---
+        ## Upper Confidence Bound. Is this working?
+        <br><br>
+
+        <div class="center">
+          <img src="img/bandits_comparison.png" alt="">
+        </div>
+        </textarea>
+      </section>
+      
+
+      <section class="standout" data-background-color="#282a36">
+        <h2>AlphaGo / AlphaZero / MuZero</h2>
+      </section>
+      
+
+      <section>
+        <h2>Action search space. Chess vs Go</h2>
+        <div class="center">
+          <div class="grid c2">
+            <video width=500px data-autoplay data-loop src="https://thumbs.gfycat.com/UniqueFlashyGoral-mobile.mp4"></video>
+            <video width=500px data-autoplay data-loop src="https://thumbs.gfycat.com/FrailHandsomeAmazonparrot-mobile.mp4"></video>
+          </div>
+        </div>
+      </section>
+
+
+<section data-markdown>
+  <textarea data-template>
+    ### Simulation-based search
+    <br>
+
+    <img src="./img/rollout.png" class="clean" alt="lookahead" width="500px">
+
+    <br>
+
+    - Sample-based variant of <span class="alert">Forward Search</span>
+    - Simulate episodes of experiences from the current state and compute:
+
+    $$
+    V(S_t)      = \frac{1}{K} \sum_{k=1}^{K} G_t^k \rightsquigarrow V^{\pi}(s) \\qquad
+    Q(S_t, A_t) = \frac{1}{K} \sum_{k=1}^{K} G_t^k \rightsquigarrow Q^{\pi}(s, a) \\
+    $$
+    ---
+    ### Monte-Carlo Tree Search
+    <br>
+
+    In MCTS, we incrementally build a search tree containing visited states and actions, together with estimated action values $Q(S_t,A_t)$ for each of these pairs.
+
+    <ul>
+    <li class="fragment">Repeat (for each simulated episode)
+    <ul>
+    <li class="fragment"><span class="alert">Select</span> until you reach a leaf node of the tree, pick actions according to $Q(s ,a)$.</li>
+    <li class="fragment"><span class="alert">Expand</span> search tree by one node</li>
+    <li class="fragment"><span class="alert">Rollout</span> until episode termination with a fixed simulation policy</li>
+    <li class="fragment"><span class="alert">Update</span> action-values $Q(S_t,A_t)$ for all state-action pairs in the tree
+    $$
+    Q(S_t, A_t) =
+    \frac{1}{N(s,a)}
+    \sum_{k=1}^{K}
+    \sum_{u=t}^{T}
+    \mathcal{1}(S_u^k,A_u^k = s,a) G_u^k \rightsquigarrow Q^{\pi}(s, a)
+    $$
+    </li>
+    </ul>
+    </li>
+    <li class="fragment">Output best action according to $Q(s_t, a_t)$ in the root node when time runs out.</li>
+    </ul>
+    ---
+    ### Main estimators in AlphaZero / MuZero
+    <div class="center">
+      <div class="r-stack">
+        <img width="50%" src="img/muzero_value_policy_net.webp" alt="muzero policy value network" class="fragment fade-out" data-fragment-index="0">
+        <img src="img/muzero_exhaustive_search.png" alt="" class="fragment current-visible" data-fragment-index="0">
+        <img src="img/muzero_value_role.png" alt="" class="fragment current-visible">
+        <img src="img/muzero_policy_role.png" alt="" class="fragment current-visible">
+        <img width=60% src="img/muzero_search_tree.webp" alt="" class="fragment current-visible">
+      </div>
+    </div>
+    ---
+    ### Node Selection. Prior UCB (PUCB)
+    <br><br>
+    <div class="center">
+    <div class="grid c2">
+    <img src="img/muzero_search_tree.webp" alt="">
+    <div style="text-align: left">
+    <br>
+    <br>
+    Remember UCB?
+
+    $$
+    U(s,a) = v(s,a) + c \cdot p(s,a)
+    $$
+    
+    where $c$ is depending on state counts $N(s,a)$.
+    </div>
+    </div>
+    </div>
+    ---
+    ### MuZero. Search, action-selection and training
+    <br><br>
+    <img src="img/muzero_full.webp" width="80%" alt="">
+    ---
+    ### MuZero. Search, action-selection and training
+    <br><br>
+    <img src="img/muzero_results.png" width="80%" alt="">
+  </textarea>
+</section>
+
+
+      <section class="standout" data-background-color="#282a36">
+        <h2>Exploration bonuses in Deep RL</h2>
+      </section>
+
+
+      <section data-markdown>
+        <textarea data-template>
+          ## Exploration bonus
+          <br>
+          Until now we only worked with <span class="alert">extrinsic</span> rewards, typically environmental signals.
+
+          However rewards can be <span class="alert">intrinsic</span>:
+          </br>
+
+          - Social (influence, imitation, explanation)
+          - Desire to control (empowerment)
+          - <span class="alert">Curiosity</span> (reach new states)
+          - Losses learned via meta-learning
+          - Learning progress
+
+          <p class="fragment">
+            We can use it like this:
+            $$
+              r_t = r^e_t + r^i_t,
+            $$
+            where $r^e_t$ is the original, environmental reward and $r^i_t$ is the intrinsic reward.
+          </p>
+          ---
+          ## Intrinsic Curiosity Module (ICM)
+          <br>
+          <br>
+          <br>
+          
+          - a learned embedding $\phi(s_t; \\; \theta) \rightarrow \mathbb{R}^k$.
+          - an <span class="alert">inverse</span> model $g(\phi(s_t), \\; \phi(s_{t+1}); \\; \varphi) \rightarrow \mathcal{A}$. Learns to predict action $a_t$ from its consequences on $s_t$.
+          - a <span class="alert">forward</span> model $f(\phi(s_t), a_t; \\; \omega) \rightarrow \mathbb{R}^k$. Learns to predict the embedding of the next state, $\phi(s_{t+1})$.
+
+          <br>
+          <br>
+          <br>
+          <p class="fragment">
+          The intrinsic reward is the error of the forward model in the embedding space:
+          $$
+            r^t_i = \frac{\eta}{2}\lVert \hat{\phi}(s_{t+1}) - \phi(s_{t+1}) \rVert^2_2
+          $$
+          ---
+          ## Intrinsic Curiosity Module
+          <div class="center"><img src="./img/icm_arch.png" alt="icm_arch"></div>
+          ---
+          ## Intrinsic Curiosity Module
+          <div class="center">
+            <div class="grid c3">
+              <img width="400px" src="./img/icm_doom.gif" alt="icm_doom">
+              <img class="fragment" width="400px" src="./img/icm_maze.png" alt="icm_maze">
+              <img class="fragment" width="400px" src="./img/icm_ocupancy.png" alt="icm_ocupancy">
+            </div>
+          </div>
+          ---
+          ## Random Network Distillation (RND)
+          <br>
+          <br>
+          <br>
+          
+          - a _target_ neural network $f_{\text{rnd}} : \mathcal{S} \rightarrow \mathbb{R}^k$
+          - a _predictor_ neural network $\hat{f} : \mathcal{S} \rightarrow \mathbb{R}^k$ which is trained to track the output of the random network.
+
+          <br>
+          <br>
+          <br>
+          <p class="fragment">
+          The objective is also used as <span class="alert">intrinsic reward</span>:
+          $$
+            r^t_i = \lVert \hat{f}(s_t; \theta) - f(s_t) \rVert^2_2
+          $$
+          </p>
+          ---
+          ## Random Network Distillation
+          <div class="center">
+            <video width=50% data-autoplay src="https://cdn.openai.com/research-covers/prediction-based-rewards/animated-pyramid_10-29e.mp4"></video>
+          </div>
+          ---
+          ## Random Network Distillation
+          <div class="center"><img width=60% src="./img/rnd_progress.svg" alt="rnd_progress"></div>
+          ---
+          ## Random Network Distillation
+          <div class="center"><img width=90% src="./img/rnd_montezuma.png" alt="rnd_montezuma"></div>
+          ---
+          ## Are we there yet?
+          <div class="center">
+            <div class="grid c2">
+              <img src="./img/awty_montezuma.png" alt="montezuma_intrinsic_comparison">
+              <img class="fragment" src="./img/awty_all.png" alt="all_games_intrinsic_comparison">
+            </div>
+          </div>
+          ---
+          ### Bootstrap Your Own Latent for Exploration
+          <br>
+          <br>
+          <br>
+
+          - use a <span class="alert">self-supervision</span> inspired method
+          - to construct a multi-step predictive model
+          - in the latent space
+
+          <br>
+          <br>
+          <br>
+          <p class="fragment">
+            Use the sum of prediction losses across future timesteps as an intrinsic reward.
+          </p>
+          ---
+          ### Bootstrap Your Own Latent ~for Exploration~ for Self-Supervised Learning
+          <div class="center">
+            <img width=60% src="./img/byol_byol.png" alt="byol_byol">
+            <p class="fragment">
+              <span class="alert">Goal:</span> minimize the distance between the embeddings of two augmentations of the same image.
+            </p>
+            <p class="fragment">
+              Target network parameters $\xi$ are updated via an expected moving average: $\xi = \tau\xi + (1 - \tau)\theta$.
+            </p>
+          </div>
+          ---
+          ### Bootstrap Your Own Latent for Exploration
+          <div class="center">
+            <div class="grid c2">
+              <img src="./img/byol_arch.png" alt="byol_explore_architecture">
+              <div>
+                <ul>
+                  <li class="fragment">an embedding module $f_{\theta}$</li>
+                  <li class="fragment">closed loop RNN aggregates past embeddings and actions,</li>
+                  <li class="fragment">open loop RNN simulates <span class="alert">future</span> latent states while only observing actions,</li>
+                  <li class="fragment">target network generates learning targets for the world model.</li>
+                  <li class="fragment"><span class="alert">Goal</span>: minimize the distance between the future predictions of the model and the embeddings of the target network</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          ---
+          ### Bootstrap Your Own Latent for Exploration
+          <div class="center">
+            <div class="grid c2">
+              <img src="./img/byol_vs_all.png" alt="byol_comparison">
+              <img class="fragment" src="./img/byol_vs_all_400k.png" alt="byol_comparison">
+            </div>
+          <strong>Left:</strong> Mean capped human normalised score (CHNS) across the 10 most difficult exploration games in Atari. <strong>Right:</strong> Mean CHNS on DM Hard-8.
+          </div>
+          ---
+          ### Bootstrap Your Own Latent for Exploration
+          <div class="center">
+            <img width=60% src="./img/byol_hard8.gif" alt="byol on DM-Hard8">
+            <br>
+            Agent has to pick the two boulders and use them to plug the holes in the floor.
+          </div>
+        </textarea>
+      </section>
+
+      <section class="standout" data-background-color="#282a36">
+        <h2>Thank You!</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <!--   
+  End of content happens here.
+  -->
+
+  <script src="dist/reveal.js"></script>
+  <!-- <script src="plugin/notes/notes.js"></script> -->
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script src="plugin/math/math.js"></script>
+  <script src="plugin/animate/plugin.js"></script>
+  <script src="plugin/animate/svg.min.js"></script>
+
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      width: 1280,
+      height: 800,
+      // center: false,
+      hash: true,
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealMath.KaTeX, RevealAnimate, RevealHighlight]
+    });
+  </script>
+</body>
+
+</html>
