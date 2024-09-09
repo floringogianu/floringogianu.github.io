@@ -1,0 +1,703 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>Learning & Meta-Learning</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/bitdefender.css">
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section id="title-slide" class="standout align-left" data-background-color="#100C08">
+        <h1>Learning and meta-learning</h1>
+        <p>With deep neural networks</p>
+      </section>
+
+
+      <!-- <section data-markdown class="beamer align-left">
+        <textarea data-template>
+          ## Lista de idei
+
+          - Menționează treaba cu autentificarea piesei de teatru
+          - Orașele invizibile ale lui Calvino
+          - Contra-exemplul lui Chomsky
+          - Contra-exemplul lui LeCun
+
+          Probleme
+          - bias in the data, link to transparency
+          - lipsa testelor
+            - contamination
+            - theory-of-mind rebuttal
+
+        </textarea>
+      </section> -->
+
+
+      <section data-background-color="#FFF">
+        <div class="r-stack">
+          <img data-src="img/covers.webp" class="fragment fade-out" data-fragment-index="0" alt="nature covers">
+          <img data-src="img/alpha_fold_casp.svg" class="fragment fade-in-then-out" data-fragment-index="0"
+            width="900px" alt="AlphaFold CASP">
+          <img data-src="img/alpha_fold_nature.webp" class="fragment fade-in-then-out" data-fragment-index="1"
+            width="500px" alt="nature AlphaFold">
+          <div class="fragment fade-in-then-out grid" data-fragment-index="2">
+            <div>
+              <img data-src="img/calvino_valdrada.webp" alt="">
+              <p class="caption textsc small">The ancients built Valdrada on the shores of a lake, with houses all
+                verandas one above the other, [...]. Thus the traveler, arriving, sees two cities: one erect above the
+                lake, and the other reflected, upside down. [...]</p>
+            </div>
+            <div>
+              <img data-src="img/calvino_maurilia.webp" alt="">
+              <p class="caption textsc small">In Maurilia, the traveler is invited to visit the city and, at the same
+                time, to examine some old postcards that show it as it used to be: the same identical square with a hen
+                in the place of the bus station, [...], two young ladies with white parasols in the place of the
+                munitions factory. [...]</p>
+            </div>
+            <div>
+              <img data-src="img/calvino_ersilia.webp" alt="">
+              <p class="caption textsc small">In Ersilia, to establish the relationships that sustain the city's life,
+                the inhabitants stretch strings from the corners of the houses, white or black or gray or
+                black-and-white according to whether they mark a relationship of blood, of trade, authority, agency.
+                [...]</p>
+            </div>
+          </div>
+          <!-- <img data-src="img/flamingo_obama.webp" width="700px" class="fragment fade-in-then-out" data-fragment-index="3"
+            alt="flamingo example">
+          <img data-src="img/flamingo_obama_fail.webp" width="700px" class="fragment" data-fragment-index="4"
+            alt="flamingo fail"> -->
+        </div>
+      </section>
+
+
+      <section class="standout" data-background-color="#100C08">
+        <h2>Recently it started to strike a bit different...</h2>
+      </section>
+
+      <section data-background-color="#2e2e3a">
+        <video width="700px">
+          <source data-src="./img/gpt4_movie_app.mp4" type="video/mp4" />
+        </video>
+      </section>
+
+      <section data-background-color="#FFF">
+        <div class="r-stack">
+          <img data-src="img/pope_balenciaga.webp" class="fragment fade-out" data-fragment-index="0" alt="pope">
+          <img data-src="img/tom.webp" class="fragment fade-in-then-out" data-fragment-index="0"
+            alt="gpt theory of mind" width="700px">
+          <img data-src="img/tom_fail.webp" class="fragment fade-in-then-out" data-fragment-index="1"
+            alt="gpt theory of mind fail" width="700px">
+          <img data-src="img/workforce_impact.webp" class="fragment fade-in-then-out" data-fragment-index="2"
+            alt="gpt workforce impact" width="700px">
+          <img data-src="img/pause_ai.webp" class="fragment fade-in-then-out" data-fragment-index="3" alt="pause_ai"
+            width="700px">
+        </div>
+      </section>
+
+
+      <section class="standout" data-background-color="#100C08">
+        <h2>What drives recent results is the ability of Neural Networks to leverage <s>large</s> humongous amounts of
+          <span class="alert purpleBit">data</span> for learning <span class="alert goldBit">representations</span> that
+          elicit unexpected <span class="alert lustBit">emergent</span> behaviour.
+        </h2>
+      </section>
+
+
+      <section data-markdown class="beamer align-left" data-separator-notes="^Note:">
+        <textarea data-template>
+          ## Everything is a function
+
+          <img data-src="img/function.svg" alt="everything is a function" class="center">
+
+          <br>
+          <br>
+          In science the functions we use to model aspects of the world have nice properties:
+
+          <br>
+          <br>
+
+          - fairly simple
+          - have no free parameters, mostly constants
+          - encode our knowledge and assumptions about the world
+          - are not solely predictive but also explanatory
+
+          ---
+          ## Neural Networks are <span class="alert">over</span>-parameterized functions
+
+          <img data-src="img/input_output_nn.svg" alt="nn is over-parameterized function" class="center">
+
+          <br>
+          <br>
+          In machine learning we replace the function with neural networks that:
+          <br>
+          <br>
+
+          - have a significantly larger number of free parameters and no constants
+          - encode very little structure about the world (mostly none, really)
+          - even simple neural networks are universal function approximators
+          - what we gain in generality we loose in explainability
+
+          <p class="fragment alert">How do we adjust the parameters so that the function fits the data?</p>
+
+          ---
+          ## How to train your neural network? What is a <span class="alert">model</span>?
+
+          <img data-src="img/model.svg" alt="nn is over-parameterized function" class="center">
+
+          <p> In machine learning a <span class="alert">model</span> is the combination of:</p>
+
+          - data
+          - function approximation
+          - loss function (also called objective)
+          - optimization algorithm
+
+          These together determine the performance and the <span class="emph">properties</span> of the resulting model.
+
+          ---
+          ## How to train your neural network?
+
+          <div class="r-stack full">
+            <img data-src="img/backprop_0.svg" class="fragment fade-out" data-fragment-index="0">
+
+            <img data-src="img/backprop_1.svg" class="fragment fade-in-then-out" data-fragment-index="0">
+
+            <img data-src="img/backprop_2.svg" class="fragment fade-in-then-out" data-fragment-index="1">
+
+            <img data-src="img/backprop_3.svg" class="fragment fade-in-then-out" data-fragment-index="2">
+
+            <img data-src="img/backprop_4.svg" class="fragment fade-in-then-out" data-fragment-index="3">
+
+            <img data-src="img/backprop_5.svg" class="fragment fade-in" data-fragment-index="4">
+          </div>
+
+          <br>
+          <br>
+          
+          For every datapoint $(x_i, t_i)$ in the dataset, use the network to generate a prediction $y_i$. Then measure the error of the model using the loss function $L(y_i, t_i)$ and use it to adjust the weights.
+          
+          <p class="fragment" data-fragment-index="5">The algorithm for computing the direction and magnitude of the parameters update is called <span class="alert">backpropagation</span>.</p>
+          ---
+          ## How to test your neural network? Generalization
+          <div class="grid c2 align-items--end">
+            <div>
+              <img data-src="./img/what_we_want.svg">
+              <p class="caption">What we want</p>
+            </div>
+            <div class="fragment">
+              <img data-src="./img/what_we_do.svg">
+              <p class="caption">What we do</p>
+            </div>
+          </div>
+          <span class="cite">see also <a href="https://docs.google.com/presentation/d/1JLCCvE805ZVwrrdKAdW9jiVcNN4GLlYA0Qns1rIPrtc/edit?usp=share_link" class="href">Rae, 2023</a></span>
+        </textarea>
+      </section>
+
+
+      <section class="beamer align-left" data-background-color="#FFF">
+        <h2>The turning point. 2012 ImageNet challenge</h2>
+        <div class="r-stack">
+          <div class="fragment fade-out" data-fragment-index="0">
+            <img data-src="img/imagenet_example.webp" alt="imagenet task">
+            <p class="caption">ImageNet challenge consists of a dataset of over 1M images in 1000 classes. Images can
+              vary significantly along different properties (columns).
+            </p>
+            <span class="cite">adapted from Prince, 2023</span>
+          </div>
+          <div class="fragment fade-in-then-out" data-fragment-index="0">
+            <img data-src="img/imagenet_progress.webp" width="800px" alt="imagenet progress">
+            <p class="caption"><span class="emph">Top-5 test error.</span> 2012 marks the year of the first entry of a
+              deep neural network trained end tot end. Notice the correlation between depth of the network and
+              performance.
+            </p>
+            <span class="cite"><a
+                href="https://semiengineering.com/new-vision-technologies-for-real-world-applications/"
+                class="href">source</a></span>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="beamer align-left" data-background-color="#FFF">
+        <h2>Neural Networks learn <span class="alert">representations</span></h2>
+        <div class="r-stack">
+          <div class="fragment fade-out" data-fragment-index="0">
+            <img data-src="img/cnn_features.webp" width="800px" alt="features of a CNN">
+            <p class="caption"><span class="emph">Left:</span> filters learned by the first layer of a neural network.
+              <span class="emph">Middle & Right:</span> Patterns in the data the filters respond to in deeper layers.
+              Early layers learn low-level filters, such as edge detectors while deeper layers learn higher-level
+              representations.
+            </p>
+          </div>
+          <div class="fragment fade-in" data-fragment-index="0">
+            <img data-src="img/cnn_features_viz.webp" alt="features viz of a CNN">
+            <p class="caption">Another way of visualising how a NN employs these filters for learning representations.
+              Same hierarchical nature across the network's depth is apparent.
+            </p>
+          </div>
+        </div>
+        <p class="fragment"><span class="alert">Representations learned on one task / dataset can be reused in other
+            models.</span> This is was critical in Deep Learning's rapid progress.</p>
+        <span class="cite">from <a href="https://distill.pub/2017/feature-visualization/" class="href">Olah,
+            2017</a></span>
+      </section>
+
+
+      <section class="standout align-left" data-background-color="#100C08">
+        <h2>What drives recent results is the ability of Neural Networks to leverage <s>large</s> humongous amounts of
+          <span class="alert purpleBit">data</span> for learning <span class="alert goldBit">representations</span> that
+          elicit unexpected <span class="alert lustBit">emergent</span> behaviour.
+        </h2>
+
+        <br>
+        <br>
+        <ul>
+          <li>NNs learn representations that are hierarchical and transferable</li>
+          <li>But also:</li>
+          <ul>
+            <li>Neural Networks are universal function approximators</li>
+            <li>Performance scales with depth and training data</li>
+          </ul>
+        </ul>
+      </section>
+
+
+      <section class="standout" data-background-color="#100C08">
+        <h2>Demistifying large language models</h2>
+      </section>
+
+
+      <section data-markdown class="beamer align-left" data-separator-notes="^Note:">
+        <textarea data-template>
+        ## What are <span class="alert">autoregressive</span> language models?
+
+        <img data-src="img/language_model.svg" alt="nn is over-parameterized function" class="center">
+
+        <br>
+        <br>
+
+        - A language model computes the probability of a sequence of words $s=(w_1, w_2, ..., w_T)$.
+        - An <span class="alert">autoregressive</span> model computes the probability of the next word following a sequence of words.
+        - Hence the name autoregressive or next-word prediction.
+        - The preceeding word sequence is called a <span class="emph">prefix, context or prompt</span>.
+
+        ---
+        ## How would one solve next-word prediction?
+
+        First take a large dataset and put it into a table like this:
+
+        | Prefix | Next word | Count |
+        | ------ | --------- | ----- |
+        | colorless, <span class="greenBit">green</span>, ideas, sleep, | <span class="alert">furiously</span> | count(colorless, green, ideas, sleep, furiously) |
+        | colorless, <span class="lustBit">red</span>, ideas, sleep, | <span class="alert">furiously</span> | count(colorless, red, ideas, sleep, furiously) |
+        | colorless, green, ideas, sleep, | <span class="alert">gently</span> | count(colorless, green, ideas, sleep, gently) |
+        | ... | ... | ... |
+        | ... | ... | ... |
+
+        Number of rows scales with the size of the dataset. But it would allow us to compute the probability of the next word, $p(\text{furiously} | \text{colorless, green, ideas, sleep})$.
+
+        <span class="cite">adapted from <a href="https://drive.google.com/file/d/1dk3o-fcdH1Y7-rGGqlVR35AZ1CVwz0qi/view?usp=share_link" class="href">Cho, 2023</a></span>
+
+        ---
+        ## How would one solve next-word prediction?
+
+        Then retrieve all the rows that match the prefix and divide the count of the sequence we are interested in  by the sum of counts:
+
+        $$
+        p(\text{furiously} | \text{colorless, green, ideas, sleep}) \sim \frac{\text{count(colorless, green, ideas, sleep, furiously)}}{\sum \text{count(colorless, green, ideas, sleep, x)}}
+        $$
+
+        | Prefix | Next word | Count |
+        | ------ | --------- | ----- |
+        | colorless, <span class="greenBit">green</span>, ideas, sleep, | <span class="alert">furiously</span> | count(colorless, green, ideas, sleep, furiously) |
+        | colorless, <span class="lustBit">red</span>, ideas, sleep, | <span class="alert">furiously</span> | count(colorless, red, ideas, sleep, furiously) |
+        | colorless, green, ideas, sleep, | <span class="alert">gently</span> | count(colorless, green, ideas, sleep, gently) |
+        | ... | ... | ... |
+        | ... | ... | ... |
+        <p class="fragment"> In practice we approximate the table of counts with a neural network and use an objective that is <span class="alert">equivalent to counting</span> sequence frequencies.</p>
+        <span class="cite">adapted from <a href="https://drive.google.com/file/d/1dk3o-fcdH1Y7-rGGqlVR35AZ1CVwz0qi/view?usp=share_link" class="href">Cho, 2023</a></span>
+
+        </textarea>
+      </section>
+
+      <section data-background-color="#FFF">
+        <div class="r-stack">
+          <img data-src="img/shannon.webp" class="fragment fade-out" data-fragment-index="0" alt="nature covers">
+          <img data-src="img/shannon_construction.webp" class="fragment fade-in-then-out" data-fragment-index="0"
+            alt="Shannon GPT">
+        </div>
+        <span class="cite">from <a href="http://cs-www.cs.yale.edu/homes/yry/readings/general/shannon1948.pdf"
+            class="href">Shannon, 1948</a></span>
+      </section>
+
+
+      <section data-markdown class="beamer align-left" data-separator-notes="^Note:">
+        <textarea data-template>
+        ## Is it really all counting? <span class="fragment alert" data-fragment-index="3">No! It's also compression!</span>
+
+        Imagine we want to retrieve: $p(\text{thunderously} | \text{colorless, green, ideas, sleep})$. If this sequence is not in our table, then the probability is $0$.
+
+        </br>
+        </br>
+
+        <div class="grid fragment" data-fragment-index="1">
+          <div>
+            <p>The training dataset may contain the following samples:</p>
+            <ul>
+              <li>Colorless green ideas <span class="greenBit">sleep</span> <span class="blueBit">furiously</span>.</li>
+              <li>Colorless green ideas <span class="greenBit">play</span> <span class="blueBit">furiously</span>.</li>
+              <li>He <span class="greenBit">slept</span> <span class="purpleBit">thunderously</span> during the entire <span class="marigoldBit">play</span>.</li>
+            </ul>
+          </div>
+          <img data-src="./img/compression.svg">
+        </div>
+
+        </br>
+        </br>
+        <p class="fragment" data-fragment-index="2">Neural networks <span class="alert">compress</span> the data so that similar words will have similar representations.</p>
+        <span class="cite">adapted from <a href="https://drive.google.com/file/d/1dk3o-fcdH1Y7-rGGqlVR35AZ1CVwz0qi/view?usp=share_link" class="href">Cho, 2023</a></span>
+        ---
+        ## Language models learn representations too
+
+        <div>
+          <img data-src="./img/word_vectors.webp">
+          <p class="caption">Compute the distance and direction, in the space of learned representations, between <span class="textsc">Berlin</span> and <span class="textsc">Germany</span>. Using the resulting projection on another capital, say <span class="textsc">Rome</span> would return the word representation for <span class="textsc">Italy</span>.</p>
+        </div>
+
+        </textarea>
+      </section>
+
+
+      <section class="beamer align-left">
+        <h2>Evaluation of large language models</h2>
+        <p><span class="alert">After</span> training the neural network, it is evaluated on a large number of tasks,
+          usually in excess of 200. Examples:</p>
+
+        <p class="task">
+          <span class="prompt">What is the name of the element with an atomic number of 6?</span>
+          <span class="answer">>> Carbon</span>
+        </p>
+        <p class="task">
+          <span class="prompt">It started raining because the driver turned the wipers on.<br>The driver turned the
+            wipers on because it started raining.</span>
+          <span class="answer">>> Sequence with higher probability</span>
+        </p>
+        <p class="task">
+          <span class="prompt">In the following chess position, find a checkmate-in-one move. 1. e4 c5 2. Nf3 e5 3. Nc3
+            Nc6 4. Bb5 Nge7 5. O-O g6 6. Nd5 a6 7.</span>
+          <span class="answer">>> Nf6#</span>
+        </p>
+
+        <p class="task">
+          <span class="prompt">Q: 5 + 2 = option: 4 option: 7 option: 3 option: 6</span>
+          <span class="prompt">A: 7</span>
+          <span class="prompt">Q: 4 + 9 = option: 3 option: 6 option: 13 option: 4</span>
+          <span class="prompt">A:</span>
+          <span class="answer">>> 13</span>
+        </p>
+      </section>
+
+
+      <section class="beamer align-left">
+        <h2>Evaluation of large language models</h2>
+        <p class="task">
+          <span class="prompt">The meeting starts in less than an hour. So the meeting starts in less than ten
+            minutes.</span>
+          <span class="answer">>> no-entailment</span>
+        </p>
+
+        <p class="task">
+          <span class="prompt">Premise: Evelyn sees that William believes that a brown and black dog runs on the grass
+            outdoors in front of a sidewalk.<br>Hypothesis: William believes that a brown and black dog runs on the
+            grass outdoors in front of a sidewalk.</span>
+          <span class="answer">>> entailment</span>
+        </p>
+
+        <p class="task">
+          <span class="prompt">A bug hits the windshield of a car. Does the bug or the car have a larger force acting on
+            it due to the impact?</span>
+          <span class="answer">>> neither</span>
+        </p>
+
+        <p class="task">
+          <span class="prompt">Which statement is sarcastic?<br>(a) Because Romania is not a real country,
+            obviously.<br>(b) Because Atlantis is not a real country, obviously.</span>
+          <span class="answer">>> (a)</span>
+        </p>
+      </section>
+
+
+      <section class="standout" data-background-color="#100C08">
+        <h2>Two surprising findings...</h2>
+        <p>...or when it's starting to get interesting</p>
+      </section>
+
+
+      <section data-background-color="#FFF">
+        <div class="r-stack">
+          <img data-src="img/nature_model_size.webp" class="fragment fade-out" data-fragment-index="0"
+            alt="evolution of model size">
+
+          <div class="fragment fade-in-then-out" data-fragment-index="0">
+            <img data-src="img/scaling_laws.webp" alt="scaling laws">
+            <p class="caption">Performance at test time scales smoothly with <br><span class="alert">computational
+                resources</span>, <span class="alert">dataset size</span> and <span class="alert">model size</span>.
+            </p>
+            <span class="cite">from <a href="https://arxiv.org/abs/2001.08361" class="href">Kaplan, 2020</a></span>
+          </div>
+
+          <img data-src="img/scaling_laws_tshirt.webp" class="fragment fade-in-then-out" data-fragment-index="1"
+            alt="evolution of model size">
+        </div>
+      </section>
+
+
+      <section data-background-color="#FFF">
+          <img data-src="img/sutton.webp" width="800px" alt="evolution of model size">
+      </section>
+
+      <section data-background-color="#FFF" class="align-left beamer">
+        <h2>Bitter Lesson TLDR</h2>
+        <p>
+          The biggest lesson that can be read from 70 years of AI research is that <span class="alert">general
+            methods</span> that <span class="alert">leverage computation</span> are ultimately the most effective, and
+          by a large margin.
+        </p>
+
+        <br>
+        <ul>
+          <li class="fragment">AI researchers have often tried to build knowledge into their agents,</li>
+          <li class="fragment">this always helps in the short term,</li>
+          <li class="fragment">in the long run it plateaus and even inhibits further progress,</li>
+          <li class="fragment">breakthrough progress eventually arrives by an opposing approach based on scaling
+            computation by search and learning.</li>
+        </ul>
+      </section>
+
+
+      <section data-background-color="#FFF" class="align-left beamer">
+        <h2>But <span class="alert">why</span> is scaling effective?</h2>
+
+        <p>Scaling <span class="alert">models</span>:<br>
+          Neural Networks that perform well do it so by finding efficient representations of the data -- that is they
+          learn <span class="emph">good models of the world</span>. But models of the world can be complicated and
+          learning them requires expressive, high-capacity networks.</p>
+
+        <br>
+        <br>
+
+        <p>Scaling <span class="alert">data</span>:<br>
+          Next-word prediction is not a single task. Predicting the next word for a riddle, a logical puzzle, a game of
+          chess, or even a plain conversation means in effect that we are training our network on a <span
+            class="emph">large, varied collection of different tasks</span>.</p>
+      </section>
+
+
+      <section class="standout align-left" data-background-color="#100C08">
+        <h2>What drives recent results is the ability of Neural Networks to leverage <s>large</s> humongous amounts of
+          <span class="alert purpleBit">data</span> for learning <span class="alert goldBit">representations</span> that
+          elicit unexpected <span class="alert lustBit">emergent</span> behaviour.
+        </h2>
+
+        <br>
+        <br>
+        <ul>
+          <li>NNs learn representations that are hierarchical and transferable.</li>
+          <li>Scaling data and models pays off and appears to offer a clear path forward.</li>
+        </ul>
+      </section>
+
+
+      <section class="beamer align-left">
+        <h2><span class="alert">In-context</span> learning</h2>
+        <p><span class="alert">After</span> training the neural network and while keeping all its parameters fixed, the
+          model is able to <span class="alert">adapt to new tasks</span>.</p>
+
+        <br>
+        <div class="grid">
+          <p class="task">
+            <span class="prompt">
+              Circulation revenue has increased by 5% in Finland. // Positive<br>
+              Panostaja did not disclose the purcahse price. // Neutral<br>
+              Paying off the national debt will be extremely painful. // Negative<br>
+              <span class="greenBit">The company anticipated its operating profit to improve //</span>
+            </span>
+            <span class="answer">>> Positive</span>
+          </p>
+
+          <p class="task">
+            <span class="prompt">
+              Circulation revenue has increased by 5% in Finland. // Finance<br>
+              The defeated [...] in the NFC Championship Game. // Sports<br>
+              Apple [...] development of in-house chips. // Tech<br>
+              <span class="greenBit">The company anticipated its operating profit to improve //</span>
+            </span>
+            <span class="answer">>> Finance</span>
+          </p>
+        </div>
+        <span class="cite">example from <a href="http://ai.stanford.edu/blog/understanding-incontext/" class="href">Xie,
+            2022</a></span>
+      </section>
+
+
+      <section class="beamer align-left">
+        <h2><span class="alert">In-context</span> learning</h2>
+        <p><span class="alert">After</span> training the neural network and while keeping all its parameters fixed, the
+          model is able to <span class="alert">adapt to new tasks</span>.</p>
+
+        <br>
+        <div class="grid">
+          <p class="task">
+            <span class="answer">Prompt examples</span>
+            <span class="prompt">
+              volleyball: animal<br>
+              onions: sport<br>
+              archery: animal<br>
+              hockey: animal<br>
+              camel: plant/vegetable<br>
+              beet: sport<br>
+              golf: animal<br>
+              horse: plant/vegetable<br>
+              corn: sport<br>
+            </span>
+          </p>
+
+          <p class="task">
+            <span class="answer">Answers</span>
+            <span class="prompt">
+              llama: plant/vegetable ✓<br>
+              cat: plant/vegetable ✓<br>
+              peas: sport ✓<br>
+              carrots: sport ✓<br>
+              rugby: animal ✓<br>
+              judo: animal ✓<br>
+            </span>
+          </p>
+        </div>
+        <span class="cite">example from <a href="http://ai.stanford.edu/blog/in-context-learning/" class="href">Rong,
+            2021</a></span>
+      </section>
+
+
+      <section data-background-color="#FFF" class="align-left beamer">
+        <h2>Multi-modal models are also capable of in-context learning.</h2>
+
+        <div class="r-stack">
+          <div class="fragment fade-out" data-fragment-index="0">
+            <div class="grid">
+              <img data-src="img/kosmos.webp" alt="Kosmos-1 demo">
+              <img data-src="img/kosmos_cat.webp" alt="Kosmos-1 demo">
+
+            </div>
+            <p class="caption">Kosmos-1 is a model capable of processing language, images and sound.</p>
+          </div>
+
+          <div class="fragment fade-in-then-out" data-fragment-index="0">
+            <img data-src="img/kosmos_raven.webp" alt="Kosmos-1 Raven in-context learning." width="700px">
+            <p class="caption">The model is presented with a single example of how to solve a Raven progressive matrix.
+              It can then correctly assign a high probability to the corect image in subsequent tests.</p>
+          </div>
+        </div>
+        <span class="cite">from <a href="https://arxiv.org/abs/2302.14045" class="href">Huang, 2023</a></span>
+      </section>
+
+
+      <section class="standout align-left" data-background-color="#100C08">
+        <h2>What drives recent results is the ability of Neural Networks to leverage <s>large</s> humongous amounts of
+          <span class="alert purpleBit">data</span> for learning <span class="alert goldBit">representations</span> that
+          elicit unexpected <span class="alert lustBit">emergent</span> behaviour.
+        </h2>
+
+        <br>
+        <br>
+        <ul>
+          <li>NNs learn representations that are hierarchical and transferable.</li>
+          <li>Scaling data, models and computation pays off and appears to offer a clear path forward.</li>
+          <li>Simple learning objectives such as next-word prediction lead to complex behaviours.</li>
+        </ul>
+      </section>
+
+      <section>
+        <video width="800px">
+          <source data-src="./img/saycan.mp4" type="video/mp4" />
+        </video>
+
+        <br>
+        <span class="cite">from <a href="https://say-can.github.io/" class="href">Ahn, 2022</a></span>
+      </section>
+
+
+      <section class="standout" data-background-color="#100C08">
+        <h2>Thank You!</h2>
+      </section>
+
+
+      <section class="align-left beamer">
+        <h2>Evaluation problems</h2>
+        <div class="grid c2 align-items--end">
+          <div class="fragment">
+            <img data-src="./img/what_we_do.svg">
+            <p class="caption">What we do</p>
+          </div>
+          <div class="fragment">
+            <h3>Data contamination is becoming a major issue. <span class="alert">Benchmarks and evaluation datasets
+                keep ending up into the training set</span>.</h3>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+          </div>
+        </div>
+      </section>
+
+
+
+    </div>
+  </div>
+
+  <!--   
+  End of content happens here.
+  -->
+
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script src="plugin/math/math.js"></script>
+  <script src="plugin/animate/plugin.js"></script>
+  <script src="plugin/animate/svg.min.js"></script>
+  <script src="plugin/embed-tweet/plugin.js"></script>
+
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      width: 1280,
+      height: 800,
+      center: true,
+      hash: true,
+      controlsLayout: 'bottom-right',
+      progress: false,
+      autoPlayMedia: true,
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealNotes, RevealMath.KaTeX, RevealAnimate, RevealHighlight, RevealEmbedTweet]
+    });
+  </script>
+</body>
+
+</html>

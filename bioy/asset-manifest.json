@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/bioy/static/css/main.497aa524.chunk.css",
+    "main.js": "/bioy/static/js/main.c4b36f33.chunk.js",
+    "main.js.map": "/bioy/static/js/main.c4b36f33.chunk.js.map",
+    "runtime-main.js": "/bioy/static/js/runtime-main.38d4b16d.js",
+    "runtime-main.js.map": "/bioy/static/js/runtime-main.38d4b16d.js.map",
+    "static/js/2.36f5a782.chunk.js": "/bioy/static/js/2.36f5a782.chunk.js",
+    "static/js/2.36f5a782.chunk.js.map": "/bioy/static/js/2.36f5a782.chunk.js.map",
+    "index.html": "/bioy/index.html",
+    "precache-manifest.1fd63c1b1b2affaad68655a5b13c5067.js": "/bioy/precache-manifest.1fd63c1b1b2affaad68655a5b13c5067.js",
+    "service-worker.js": "/bioy/service-worker.js",
+    "static/css/main.497aa524.chunk.css.map": "/bioy/static/css/main.497aa524.chunk.css.map",
+    "static/js/2.36f5a782.chunk.js.LICENSE": "/bioy/static/js/2.36f5a782.chunk.js.LICENSE"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.38d4b16d.js",
+    "static/js/2.36f5a782.chunk.js",
+    "static/css/main.497aa524.chunk.css",
+    "static/js/main.c4b36f33.chunk.js"
+  ]
+}

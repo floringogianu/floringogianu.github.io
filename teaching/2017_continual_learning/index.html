@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en"> 
+  <head>
+    <meta charset="utf8">
+    <title>Continual Learning</title>
+    <meta name="description" content="Presentation of some recent results in continual learning.">
+    <meta name="author" content="Florin Gogianu">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+    <link rel="stylesheet" href="css/main.css">
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section data-background="img/galactic-neural-nets_blue.jpg">
+          <h1>Continual Learning<small style="color:#fff;">with Neural Networks</small></h1><br>
+          <p class="fragment">
+            The ability to learn new tasks in a sequential fashion while retaining the same level of performance on the previously learned tasks.</p>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Plan for today:</h3>
+          <ol>
+            <li class="fragment">Motivation for <span class="emph">Continual Learning</span></li>
+            <li class="fragment">Policy Distillation</li>
+            <li class="fragment">Progressive Neural Networks</li>
+            <li class="fragment">Overcoming Catastrophic Forgetting</li>
+          </ol>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Motivation (I):</h3>
+          <ul>
+            <li class="fragment">Training a <span class="emph">single</span> model on <span class="emph">multiple objectives</span>, sequentially.</li>
+            <li class="fragment">Transfer knowledge acquired across <span class="emph">multiple tasks</span> and <span class="emph">without</span> destroying the previously learned functions.</li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Motivation (II):</h3>
+          <ul>
+            <li>Brain optimizes multiple loss functions:
+              <q class="quote">
+                "Cost functions in the brain are likely to be complex and to be arranged to vary across areas and over development."</q><span class="cite"> Marblestone, 2016</span>
+            </li>
+            <li class="fragment">Measure of intelligence:
+               $\xi(\pi)=\sum_{\mu \in \mathcal{M}} 2^{-K(\mu)} V_{\mu}^{\pi}$.
+               <span class="cite">Legg & Hutter, 2007</span>
+            </li>
+          </ul>
+        </section>
+        <section class="left">
+          <h2 class="slide-title">Policy Distillation</h2>
+          <p><span class="cite">Rusu, 2016</span></p>
+          <ul style="font-size:90%;">
+            <li class="fragment">Uses supervised regression to train a <span class="emph">target network</span> to produce the <span class="emph">same output distribution</span> as the <span class="emph">original network</span>.</li>
+            <li class="fragment">Extract the policy of a reinforcement learning agent and train
+               a new network that performs at the expert level while being smaller
+               and more efficient.
+            </li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Policy Distillation. Advantages</h3>
+          <ul>
+            <li class="fragment">Consolidation of ensembles into a single model.</li>
+            <li class="fragment">Stabilizes learning.</li>
+            <li class="fragment"><span class="emph">Consolidation of multiple tasks into a single model.</span></li>
+          </ul>
+        </section>
+        <section class="stack">
+          <section class="left">
+            <h3 class="slide-title">Policy Distillation. Training Details</h3>
+            <ul>
+              <li class="fragment">$\mathcal N$ DQN experts learn $\mathcal N$ different games...</li>
+              <li class="fragment">... and gather transitions in different memory buffers.</li>
+              <li class="fragment">
+                The student trains on these transitions, switching to a new task each episode.</li>
+            </ul>
+          </section>
+          <section class="left">
+            <h3 class="slide-title">Training Details. Distillation Loss.</h3>
+            <ul>
+              <li>KL divergence loss:
+                <div>
+                  $$\sum_{i=1} \text{softmax}(\frac{q^T_i}{\tau})
+                  \ln \frac{\text{softmax}(\frac{q^T_i}{\tau})}{\text{softmax}
+                  (q^S_i)}$$
+                </div>
+              </li>
+            </ul>
+          </section>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Policy Distillation. Model</h3><img src="img/pd_model.png" style="background-color: #FFF;">
+        </section>
+        <section class="left" data-background="#FFF">
+          <h3 class="slide-title">Policy Distillation. Results (I)</h3><img src="img/pd_multi_game.png" style="background-color: #FFF;">
+        </section>
+        <section class="left" data-background="#FFF">
+          <h3 class="slide-title">Policy Distillation. Results (II)</h3>
+          <div><img class="center" src="img/pd_multi_game_all_hg.png" style="max-width: 70%; background-color: #FFF;"></div>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Policy Distillation. Limitation</h3>
+          <ul>
+            <li>
+              It requires a reservoir of persistent training data for all tasks</li>
+            <li class="fragment">It requires training multiple models.</li>
+          </ul>
+        </section>
+        <section class="left">
+          <h2 class="slide-title">Progressive Neural Networks</h2>
+          <p><span class="cite">Rusu, 2016</span></p>
+          <ul style="font-size:90%;">
+            <li class="fragment">Retain a pool of <span class="emph">pretrained</span> models throughout training...</li>
+            <li class="fragment">... and learn <span class="emph">lateral connections</span> from these to extract useful features for the new task.</li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Progressive Networks. Advantages</h3>
+          <ul>
+            <li class="fragment"><span class="emph">Explicit</span> support for transfer learning.</li>
+            <li class="fragment"><span class="emph">Richer compositionality</span> in which prior knowledge can be integrated at <span class="emph">each layer</span> of the feature hierarchy.</li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Progressive Networks. Training Details</h3>
+          <ul>
+            <li class="fragment">Instantiate a new neural network (<span class="emph">column</span>) for <span class="emph">each task</span> being solved.</li>
+            <li class="fragment">Transfer is enabled via <span class="emph">lateral connections</span> to features of previously learned
+               columns using parametrized <span class="emph">adapters</span>.
+            </li>
+          </ul>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Progressive Networks. Model</h3><img src="img/progressive_model.png" style="max-width: 90%; background-color: #FFF;">
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Pong Soup (I)</h3><img src="img/progressive_pong_matrix.png" style="max-width: 55%; background-color: #FFF;">
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Pong Soup (II)</h3><img src="img/progressive_pong_curves.png" style="background-color: #FFF;">
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Atari (I)</h3><img src="img/progressive_atari_matrix.png" style="max-width: 70%; background-color: #FFF;">
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Atari (II)</h3><img src="img/progressive_atari_curves.png" style="max-width: 80%; background-color: #FFF;">
+        </section>
+        <section class="left">
+          <h2 class="slide-title">Overcoming Catastrophic Forgetting</h2>
+          <p><span class="cite">Kirkpatrick, 2016</span></p>
+          <ul>
+            <li class="fragment">Brings evidence that <span class="emph">catastrophic forgetting</span> is not an inevitable feature of connectionist models.</li>
+            <li class="fragment">Proposes a regularization technique called<span class="emph"> Elastic Weight Consolidation</span>.</li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Elastic Weight Consolidation</h3>
+          <ul>
+            <li class="fragment">It is a penalty term added to the cost function that <span class="emph">constrains</span> the weights relevant to task $\mathcal A$ when
+               training on task $\mathcal B$.
+            </li>
+            <li class="fragment"><span class="emph">EWC</span> can be described as <span class="emph">on-line diagonalised Laplace approximation</span>.
+              <p class="right"><small class="cite">Huszar,<a href=""> [link]</a></small></p>
+            </li>
+          </ul>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Elastic Weight Consolidation</h3><img class="center" src="img/ocf_ewc.png" style="max-width: 70%; background-color: #FFF;">
+          <p><small>EWC ensures task $\mathcal A$ is remembered while training on task
+               $\mathcal B$. Training trajectories are illustrated in a schematic
+               parameter space, with parameter regions leading to good performance on
+               task $\mathcal A$ (gray) and on task $\mathcal B$ (cream color).
+               After learning the first task, the parameters are at $\theta^*_A$.</small></p>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Elastic Weight Consolidation</h3>
+          <ul style="font-size: 80%;">
+            <li>Neural networks, a probabilistic perspective:
+               $$\log p(\theta | \mathcal D) = \log p(\mathcal D | \theta)
+                  + \log p(\theta) - \log p(\mathcal D)$$
+            </li>
+            <li class="fragment">How about multiple tasks?
+               $$\log p(\theta | \mathcal{D}_A, \mathcal{D}_B)
+                  = \underbrace{\log p(\mathcal{D}_B|\theta)}_{\mathcal{-L}_B(\theta)}
+                  + \underbrace{\log p(\theta | \mathcal{D}_A)}_{??}
+                  - \log p(\mathcal{D}_B)$$
+            </li>
+            <li class="fragment">The posterior distribution contains information about <span class="emph">which parameters</span> are important for task $\mathcal A$ ...</li>
+            <li class="fragment">... and it is also <span class="emph">intractable</span>.</li>
+          </ul>
+        </section>
+        <section data-background="#FFF" data-state="laplacian">
+          <h3 class="slide-title">Laplace Approximation</h3>
+          <div class="fragment action-animate"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="640"
+   height="400"
+   viewBox="0 0 169.33333 105.83335"
+   version="1.1"
+   id="laplacian_approximation"
+   inkscape:version="0.92pre1 unknown"
+   sodipodi:docname="laplacian_approximation.svg"
+   inkscape:export-filename="/home/florin/Code/presentations/overcoming_catastrophic_forgetting/src/img/pd_model.png"
+   inkscape:export-xdpi="180"
+   inkscape:export-ydpi="180">
+  <defs
+     id="defs2">
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker11663"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Mend">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#2c001e;fill-opacity:1;fill-rule:evenodd;stroke:#2c001e;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path11661"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path4353"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#2c001e;fill-opacity:1;fill-rule:evenodd;stroke:#2c001e;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker8354"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path8352"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path4347"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path4341"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <linearGradient
+       id="linearGradient4307"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4305" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.5"
+     inkscape:cx="321.65082"
+     inkscape:cy="222.65442"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer3"
+     showgrid="false"
+     showguides="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1056"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     units="px"
+     objecttolerance="20"
+     inkscape:guide-bbox="true"
+     inkscape:lockguides="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4292"
+       originx="-40.71175"
+       originy="-4.7624289" />
+    <sodipodi:guide
+       position="65.280276,117.71565"
+       orientation="1,0"
+       id="guide4661"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="44.483973,11.112591"
+       orientation="0,1"
+       id="guide4671"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-40.711854,-186.40403)"
+     style="display:inline" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="p_theta"
+     style="display:inline;opacity:1"
+     transform="translate(-40.711854,-186.40403)">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot9939"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18.66666603px;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
+         id="flowRegion9941"><rect
+           id="rect9943"
+           width="66.996681"
+           height="20.444208"
+           x="550.37268"
+           y="372.04346" /></flowRegion><flowPara
+         id="flowPara9945" /></flowRoot>  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="q_theta"
+     style="display:inline;opacity:1"
+     transform="translate(-40.711854,-8.4666775)">
+    <g
+       id="g4787">
+      <rect
+         y="8.4666748"
+         x="40.711853"
+         height="105.83334"
+         width="169.33334"
+         id="rect4306"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:medium;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;opacity:1;fill:#f7f6f5;fill-opacity:1;stroke:none;stroke-width:0.92445892;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <g
+         id="p_eq"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:21.33333397px;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;opacity:1;fill:#474747;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         transform="matrix(0.35541553,0,0,0.35541553,115.55086,21.270124)"
+         aria-label="P(θ | D)">
+        <path
+           id="path4899"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';fill:#474747"
+           d="m 122.85143,15.202411 h 3.81333 q 0.936,0 1.716,0.173334 0.79733,0.173333 1.36933,0.589333 0.572,0.416 0.90134,1.092 0.32933,0.658667 0.32933,1.646667 0,0.936 -0.32933,1.629333 -0.32934,0.693334 -0.91867,1.161334 -0.572,0.450666 -1.36933,0.676 -0.78,0.208 -1.69867,0.208 h -1.80267 v 4.16 h -2.01066 z m 3.65733,5.564001 q 2.496,0 2.496,-2.062667 0,-1.074667 -0.624,-1.473333 -0.624,-0.416001 -1.872,-0.416001 h -1.64667 v 3.952001 z"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path4901"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';fill:#474747"
+           d="m 135.29324,29.623745 q -1.092,-1.785333 -1.69867,-3.692 -0.58933,-1.906667 -0.58933,-4.212 0,-2.305333 0.58933,-4.212 0.60667,-1.906667 1.69867,-3.692 l 1.248,0.554666 q -0.988,1.681334 -1.456,3.553334 -0.45067,1.872 -0.45067,3.796 0,1.924 0.45067,3.796 0.468,1.872 1.456,3.553334 z"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path4903"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro'"
+           d="m 145.28841,20.529297 h -5.39128 q 0.12696,2.530599 0.71094,3.605469 0.72787,1.320312 1.98893,1.320312 1.26954,0 1.97201,-1.328776 0.61784,-1.167968 0.7194,-3.597005 z m -0.0254,-1.438802 q -0.23698,-2.403646 -0.69401,-3.25 -0.72786,-1.33724 -1.97201,-1.33724 -1.29492,0 -1.98046,1.320313 -0.54167,1.066406 -0.70248,3.266927 z M 142.597,13.233724 q 2.03125,0 3.19076,1.794271 1.15951,1.785807 1.15951,4.951172 0,3.156901 -1.15951,4.951172 -1.15951,1.802734 -3.19076,1.802734 -2.03971,0 -3.19075,-1.802734 -1.15951,-1.794271 -1.15951,-4.951172 0,-3.165365 1.15951,-4.951172 1.15104,-1.794271 3.19075,-1.794271 z"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path4905"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';fill:#474747"
+           d="m 152.98407,13.538411 h 1.33467 v 17.333334 h -1.33467 z"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path4907"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';fill:#474747"
+           d="m 160.86966,15.202411 h 3.03333 q 2.6,0 4.056,1.404 1.456,1.404001 1.456,4.212001 0,1.404 -0.38133,2.478666 -0.364,1.074667 -1.07467,1.802667 -0.69333,0.710667 -1.69867,1.074667 -0.988,0.364 -2.25333,0.364 h -3.13733 z m 2.89466,9.706667 q 1.73334,0 2.652,-0.988 0.936,-1.005333 0.936,-3.102666 0,-2.08 -0.936,-3.033334 -0.936,-0.953333 -2.652,-0.953333 h -0.884 v 8.077333 z"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path4909"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';fill:#474747"
+           d="m 171.00966,29.069079 q 0.988,-1.681334 1.43866,-3.553334 0.468,-1.872 0.468,-3.796 0,-1.924 -0.468,-3.796 -0.45066,-1.872 -1.43866,-3.553334 l 1.248,-0.554666 q 1.092,1.785333 1.68133,3.692 0.60667,1.906667 0.60667,4.212 0,2.305333 -0.60667,4.212 -0.58933,1.906667 -1.68133,3.692 z"
+           inkscape:connector-curvature="0" />
+      </g>
+      <g
+         id="flowRoot4698"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:21.33333397px;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;opacity:1;fill:#474747;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         transform="matrix(0.35541553,0,0,0.35541553,53.709792,102.13439)"
+         aria-label="θ*">
+        <path
+           id="path4927"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.33333397px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro';fill:#474747"
+           d="m 147.72591,20.529297 h -5.39127 q 0.12695,2.530599 0.71093,3.605469 0.72787,1.320312 1.98894,1.320312 1.26953,0 1.972,-1.328776 0.61784,-1.167968 0.7194,-3.597005 z m -0.0254,-1.438802 q -0.23698,-2.403646 -0.69401,-3.25 -0.72786,-1.33724 -1.972,-1.33724 -1.29493,0 -1.98047,1.320313 -0.54167,1.066406 -0.70248,3.266927 z m -2.66601,-5.856771 q 2.03125,0 3.19075,1.794271 1.15951,1.785807 1.15951,4.951172 0,3.156901 -1.15951,4.951172 -1.1595,1.802734 -3.19075,1.802734 -2.03972,0 -3.19076,-1.802734 -1.15951,-1.794271 -1.15951,-4.951172 0,-3.165365 1.15951,-4.951172 1.15104,-1.794271 3.19076,-1.794271 z"
+           inkscape:connector-curvature="0" />
+        <path
+           id="path4929"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.33333397px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro';fill:#474747"
+           d="m 152.02289,18.755745 0.988,-1.629333 -1.68134,-0.693334 0.26,-0.797333 1.768,0.433333 0.156,-1.872 h 0.84934 l 0.156,1.854667 1.78533,-0.416 0.26,0.797333 -1.68133,0.693334 0.97066,1.629333 -0.676,0.502667 -1.23066,-1.490667 -1.23067,1.490667 z"
+           inkscape:connector-curvature="0" />
+      </g>
+      <path
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:medium;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;opacity:1;fill:#aea79f;fill-opacity:1;fill-rule:evenodd;stroke:#aea79f;stroke-width:0.35541555px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 46.743588,103.19728 H 204.24509"
+         id="x_axis"
+         inkscape:connector-curvature="0" />
+      <path
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:medium;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#aea79f;stroke-width:0.5291667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 46.743588,103.19728 29.379907,0.099 c 10.555298,0.25132 13.306476,-89.35801 30.121325,-89.35801 18.00181,0 18.78916,88.56543 62.72397,88.76884 l 35.5531,0.1646"
+         id="p_theta"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccssc" />
+      <path
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:medium;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#aea79f;stroke-width:0.35466313px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 105.99213,14.2848 v 88.90271"
+         id="mode"
+         inkscape:connector-curvature="0" />
+      <path
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:medium;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;opacity:1;fill:#f1e9f1;fill-opacity:0.74333735;fill-rule:evenodd;stroke:#411a35;stroke-width:0.5291667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 46.552359,103.29625 h 16.335588 c 25.086704,0 25.19531,-89.137111 42.723843,-89.137111 17.86971,0.0047 18.26334,89.137111 42.72384,89.137111 h 55.66667"
+         id="q_theta"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc" />
+      <g
+         id="q_eq">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 159.64943,38.219348 q 0,0.35115 0.0739,0.634535 0.0739,0.283385 0.20946,0.480522 0.13553,0.197137 0.32651,0.301866 0.19097,0.104729 0.43124,0.104729 0.24026,0 0.43124,-0.104729 0.19097,-0.104729 0.3265,-0.301866 0.13554,-0.197137 0.20946,-0.480522 0.0739,-0.283385 0.0739,-0.634535 0,-0.677659 -0.28339,-1.059612 -0.27722,-0.388114 -0.75774,-0.388114 -0.48053,0 -0.76391,0.388114 -0.27722,0.381953 -0.27722,1.059612 z m 2.96938,2.975539 q -0.10473,0.04928 -0.27107,0.08009 -0.16633,0.0308 -0.37579,0.0308 -0.60373,0 -1.01033,-0.283384 -0.40659,-0.283385 -0.60373,-0.726944 -0.32651,-0.05544 -0.59141,-0.221779 -0.26491,-0.172495 -0.45588,-0.437398 -0.19098,-0.264903 -0.29571,-0.622214 -0.0986,-0.357311 -0.0986,-0.794709 0,-0.486683 0.12937,-0.868636 0.12937,-0.388113 0.36348,-0.653017 0.2341,-0.264903 0.5606,-0.406595 0.32651,-0.141692 0.72079,-0.141692 0.39427,0 0.72078,0.141692 0.32651,0.141692 0.56061,0.406595 0.24026,0.264904 0.36963,0.653017 0.12937,0.381953 0.12937,0.868636 0,0.418916 -0.0986,0.770067 -0.0924,0.34499 -0.27107,0.609893 -0.17866,0.264903 -0.43124,0.437398 -0.24642,0.172495 -0.55445,0.240261 0.1417,0.240261 0.38812,0.34499 0.25258,0.104729 0.54829,0.104729 0.13553,0 0.24026,-0.01848 0.11089,-0.01848 0.19713,-0.04928 z"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#5e2750;fill-opacity:1;stroke:none;stroke-width:0.35541552px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="path4912" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 163.15188,37.658739 0.35732,-0.603732 -0.62838,-0.277225 0.11705,-0.369632 0.6715,0.154014 0.0678,-0.696141 h 0.38811 l 0.0678,0.696141 0.67765,-0.154014 0.11706,0.369632 -0.63454,0.277225 0.35731,0.603732 -0.31419,0.22794 -0.46204,-0.535967 -0.4682,0.535967 z"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#5e2750;fill-opacity:1;stroke:none;stroke-width:0.35541552px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="path4914" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 166.5679,41.3489 q -0.38811,-0.634535 -0.60373,-1.312194 -0.20946,-0.677659 -0.20946,-1.49701 0,-0.819351 0.20946,-1.497011 0.21562,-0.677659 0.60373,-1.312194 l 0.44356,0.197137 q -0.35115,0.597572 -0.51748,1.26291 -0.16018,0.665338 -0.16018,1.349158 0,0.683819 0.16018,1.349157 0.16633,0.665338 0.51748,1.26291 z"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#5e2750;fill-opacity:1;stroke:none;stroke-width:0.35541552px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="path4916" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 170.12034,38.116592 h -1.91614 q 0.0451,0.899414 0.25268,1.28144 0.25869,0.469259 0.70689,0.469259 0.45121,0 0.70089,-0.472268 0.21959,-0.415114 0.25568,-1.278431 z m -0.009,-0.511373 q -0.0842,-0.854293 -0.24666,-1.1551 -0.25869,-0.475276 -0.70088,-0.475276 -0.46024,0 -0.70389,0.46926 -0.19252,0.379017 -0.24967,1.161116 z m -0.94754,-2.081587 q 0.72194,0 1.13404,0.637712 0.41211,0.634703 0.41211,1.759723 0,1.122012 -0.41211,1.759724 -0.4121,0.640719 -1.13404,0.640719 -0.72495,0 -1.13404,-0.640719 -0.41211,-0.637712 -0.41211,-1.759724 0,-1.12502 0.41211,-1.759723 0.40909,-0.637712 1.13404,-0.637712 z"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#5e2750;fill-opacity:1;stroke:none;stroke-width:0.35541552px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="path4918" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 172.8555,35.631923 h 0.47436 v 6.160536 h -0.47436 z"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#5e2750;fill-opacity:1;stroke:none;stroke-width:0.35541552px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="path4920" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 175.65816,36.223334 h 1.07809 q 0.92408,0 1.44157,0.499003 0.51748,0.499004 0.51748,1.497011 0,0.499003 -0.13553,0.880956 -0.12937,0.381954 -0.38195,0.640696 -0.24643,0.252582 -0.60374,0.381954 -0.35115,0.129371 -0.80086,0.129371 h -1.11506 z m 1.02881,3.4499 q 0.61605,0 0.94256,-0.35115 0.33267,-0.357311 0.33267,-1.102736 0,-0.739264 -0.33267,-1.078094 -0.33267,-0.338829 -0.94256,-0.338829 h -0.31419 v 2.870809 z"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#5e2750;fill-opacity:1;stroke:none;stroke-width:0.35541552px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="path4922" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 179.26207,41.151763 q 0.35115,-0.597572 0.51133,-1.26291 0.16633,-0.665338 0.16633,-1.349157 0,-0.68382 -0.16633,-1.349158 -0.16018,-0.665338 -0.51133,-1.26291 l 0.44356,-0.197137 q 0.38812,0.634535 0.59757,1.312194 0.21562,0.67766 0.21562,1.497011 0,0.819351 -0.21562,1.49701 -0.20945,0.677659 -0.59757,1.312194 z"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:17.33333397px;line-height:16px;font-family:'Source Sans Pro';-inkscape-font-specification:'Source Sans Pro Semi-Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#5e2750;fill-opacity:1;stroke:none;stroke-width:0.35541552px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="path4924" />
+      </g>
+    </g>
+  </g>
+</svg>
+
+          </div>
+          <ul style="font-size: 80%;">
+            <!-- \frac{1}{\sqrt{\text{det}(2\pi\bf H^{-1})}}-->
+            <li class="fragment">We approximate the posterior with a Gaussian around its mode:
+               $$p(\bf\unicode[Times]{x3B8} | \mathcal D_A) \approx \frac{1}{Z_Q}
+                \times e^{-\frac{1}{2}
+                  (\bf\unicode[Times]{x3B8} - \bf\unicode[Times]{x3B8}^*_A)^\intercal
+                  \bf{H}(\bf\unicode[Times]{x3B8} - \bf\unicode[Times]{x3B8}^*_A)}$$
+            </li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Deriving the EWC penalty</h3>
+          <ul style="font-size: 80%;">
+            <!-- \frac{1}{\sqrt{\text{det}(2\pi\bf H^{-1})}}-->
+            <li>With the Laplace Approximation:
+               $$p(\bf\unicode[Times]{x3B8} | \mathcal D_A) \approx \frac{1}{Z_Q}
+                \times e^{-\frac{1}{2}
+                  (\bf\unicode[Times]{x3B8} - \bf\unicode[Times]{x3B8}^*_A)^\intercal
+                  \bf{H}(\bf\unicode[Times]{x3B8} - \bf\unicode[Times]{x3B8}^*_A)}$$
+            </li>
+            <li class="fragment"><span class="emph">EWC</span> penalty:
+              $$\begin{aligned}
+              \log p(\bf\unicode[Times]{x3B8} | \mathcal D_A)
+              & \approx -\frac{1}{2}
+                (\bf\unicode[Times]{x3B8} - \bf\unicode[Times]{x3B8}^*_A)^\intercal
+                \bf{H}(\bf\unicode[Times]{x3B8} - \bf\unicode[Times]{x3B8}^*_A) \\
+              & \approx \color{#f4d018}{ \sum_i -\frac{1}{2} \bf{H}_i
+                  (\bf{\unicode[Times]{x3B8}}_i - \bf{\unicode[Times]{x3B8}}^*_{A,i})^2}
+                    & \bf{H} \approx \text{diag}(\bf{H}) \\
+              \end{aligned}$$
+            </li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Why Fisher?</h3>
+          <ul style="font-size: 80%;">
+            <!-- \frac{1}{\sqrt{\text{det}(2\pi\bf H^{-1})}}-->
+            <li>Why <span class="emph">approximate</span> the Hessian with the (empirical) Fisher
+               $ \bf{\bar F} = \sum_i
+               \nabla \mathcal{L}(\theta)_i \nabla \mathcal{L}(\theta)_i^\intercal$ ?
+              <span class="emph">Martens, 2012</span>
+              <ul>
+                <li class="fragment">Fisher can be computed with <span class="emph">first order derivatives</span> only.</li>
+                <li class="fragment">Near a minimum is equivalent with the Hessian.<span class="cite"> Pascanu, 2014</span></li>
+                <li class="fragment">And $\bf F = -\mathbb E[\bf H]$</li>
+              </ul>
+            </li>
+            <li class="fragment">EWC loss function:
+              $$ \mathcal{L}(\theta) =
+                    \mathcal{L}_B(\theta)
+                    + \color{#f4d018}{\sum_i \frac{\lambda}{2} \bf{F}_i (\theta_i - \theta^*_{A,i})^2}
+              $$
+            </li>
+          </ul>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Mnist (I)</h3><img class="center" src="img/ocf_mnist_a.png" style="max-width: 65%; background-color: #FFF;">
+          <p><small>Training curves for three random permutations A, B, and C. Only
+               EWC is capable of maintaining a high performance on old tasks, while
+               retaining the ability to learn new tasks.</small></p>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Mnist (II)</h3><img class="center" src="img/ocf_mnist_b.png" style="max-width: 70%; background-color: #FFF;">
+          <p><small>Average performance across all tasks, using EWC (red) or SGD with
+               dropout regularization (blue). The dashed line shows the performance
+               on a single task only.</small></p>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Mnist (III)</h3><img class="center" src="img/ocf_mnist_c.png" style="max-width: 60%; background-color: #FFF;">
+          <p><small>Similarity between the Fisher information matrices as a function of
+               network depth for two different amounts of permutation. Either a
+               small square of 8 × 8 pixels in the middle of the image is permuted
+               (gray) or a large square of 26 × 26 pixels is permuted (black).</small></p>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Atari (I)</h3><img class="center" src="img/ocf_atari_a.png" style="max-width: 60%; background-color: #FFF;">
+          <p><small>Training schedule.</small></p>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Atari (II)</h3><img class="center" src="img/ocf_atari_b.png" style="max-width: 60%; background-color: #FFF;">
+          <p><small>Total human-averaged scores for each method across all games.</small></p>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="slide-title">Results. Memory life-time for random patterns</h3><img class="center" src="img/ocf_memory.png" style="max-width: 60%; background-color: #FFF;">
+          <p><small>Log-log plot of the SNR for recalling the first pattern after observing
+               $t$ random patterns. If no penalty is applied (blue), the SNR decays as
+               $(n/t)^{0.5}$ only when $t$ is smaller than the number of synapses
+               $n = 1,000$ and then decays exponentially. When EWC is applied (red),
+               the decay takes a power-law form for all times.</small></p>
+        </section>
+        <section class="left">
+          <h2 class="slide-title">Thank You!</h2>
+        </section>
+      </div>
+    </div>
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+    <script src="//cdn.jsdelivr.net/vivus/latest/vivus.min.js"></script>
+    <!--script(src="http://downlink.nz/js/socket.io.js")-->
+    <!--script(src="http://downlink.nz/js/reveal-sync.js")-->
+    <script type="text/javascript">
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        slideNumber: true,
+      
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+      
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true },
+          { src: 'plugin/math/math.js', async: true },
+          { src: 'plugin/notes/notes.js', async: true }
+        ]
+      });
+      
+      //-Reveal.addEventListener( 'laplacian', function() {
+        //-console.log("Ceva.");
+      //-}, false );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,400 @@
+@import url(https://fonts.googleapis.com/css?family=Oswald|Raleway:400,400i&display=swap);
+/*********************************************
+ * GLOBAL STYLES
+ *********************************************/
+body {
+  background: #f0f0f0;
+  background-color: #f0f0f0; }
+
+.reveal {
+  font-family: "Raleway", "Roboto", "Arial", sans-serif;
+  font-size: 20px;
+  font-weight: normal;
+  color: #000; }
+
+::selection {
+  color: #fff;
+  background: #bd1421;
+  text-shadow: none; }
+
+::-moz-selection {
+  color: #fff;
+  background: #bd1421;
+  text-shadow: none; }
+
+.reveal .slides section,
+.reveal .slides section > section {
+  line-height: 1.3;
+  font-weight: inherit; }
+
+/*********************************************
+ * HEADERS
+ *********************************************/
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 {
+  margin: 0 0 20px 0;
+  color: #383d3d;
+  font-family: "Oswald", sans-serif;
+  font-weight: normal;
+  line-height: 1.2;
+  letter-spacing: normal;
+  text-transform: none;
+  text-shadow: none;
+  word-wrap: break-word; }
+
+.reveal h1 {
+  font-size: 2.488em; }
+
+.reveal h2 {
+  font-size: 2.074em; }
+
+.reveal h3 {
+  font-size: 1.728em; }
+
+.reveal h4 {
+  font-size: 1.44em; }
+
+.reveal h1 {
+  text-shadow: none; }
+
+/*********************************************
+ * OTHER
+ *********************************************/
+.reveal p {
+  margin: 20px 0;
+  line-height: 1.3; }
+
+/* Ensure certain elements are never larger than the slide itself */
+.reveal img,
+.reveal video,
+.reveal iframe {
+  max-width: 95%;
+  max-height: 95%; }
+
+.reveal strong,
+.reveal b {
+  font-weight: bold; }
+
+.reveal em {
+  font-style: italic; }
+
+.reveal ol,
+.reveal dl,
+.reveal ul {
+  display: inline-block;
+  text-align: left;
+  margin: 0 0 0 1em; }
+
+.reveal ol {
+  list-style-type: decimal; }
+
+.reveal ul {
+  list-style-type: disc; }
+
+.reveal ul ul {
+  list-style-type: square; }
+
+.reveal ul ul ul {
+  list-style-type: circle; }
+
+.reveal ul ul,
+.reveal ul ol,
+.reveal ol ol,
+.reveal ol ul {
+  display: block;
+  margin-left: 40px; }
+
+.reveal dt {
+  font-weight: bold; }
+
+.reveal dd {
+  margin-left: 40px; }
+
+.reveal blockquote {
+  display: block;
+  position: relative;
+  width: 70%;
+  margin: 20px auto;
+  padding: 5px;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2); }
+
+.reveal blockquote p:first-child,
+.reveal blockquote p:last-child {
+  display: inline-block; }
+
+.reveal q {
+  font-style: italic; }
+
+.reveal pre {
+  display: block;
+  position: relative;
+  width: 90%;
+  margin: 20px auto;
+  text-align: left;
+  font-size: 0.55em;
+  font-family: monospace;
+  line-height: 1.2em;
+  word-wrap: break-word;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15); }
+
+.reveal code {
+  font-family: monospace;
+  text-transform: none; }
+
+.reveal pre code {
+  display: block;
+  padding: 5px;
+  overflow: auto;
+  max-height: 400px;
+  word-wrap: normal; }
+
+.reveal table {
+  margin: auto;
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+.reveal table th {
+  font-weight: bold; }
+
+.reveal table th,
+.reveal table td {
+  text-align: left;
+  padding: 0.2em 0.5em 0.2em 0.5em;
+  border-bottom: 1px solid; }
+
+.reveal table th[align="center"],
+.reveal table td[align="center"] {
+  text-align: center; }
+
+.reveal table th[align="right"],
+.reveal table td[align="right"] {
+  text-align: right; }
+
+.reveal table tbody tr:last-child th,
+.reveal table tbody tr:last-child td {
+  border-bottom: none; }
+
+.reveal sup {
+  vertical-align: super;
+  font-size: smaller; }
+
+.reveal sub {
+  vertical-align: sub;
+  font-size: smaller; }
+
+.reveal small {
+  display: inline-block;
+  font-size: 0.6em;
+  line-height: 1.2em;
+  vertical-align: top; }
+
+.reveal small * {
+  vertical-align: top; }
+
+/*********************************************
+ * LINKS
+ *********************************************/
+.reveal a {
+  color: #bd1421;
+  text-decoration: none;
+  -webkit-transition: color .15s ease;
+  -moz-transition: color .15s ease;
+  transition: color .15s ease; }
+
+.reveal a:hover {
+  color: #ec4b57;
+  text-shadow: none;
+  border: none; }
+
+.reveal .roll span:after {
+  color: #fff;
+  background: #780d15; }
+
+/*********************************************
+ * IMAGES
+ *********************************************/
+.reveal section img {
+  margin: 15px 0px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 4px solid #000;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); }
+
+.reveal section img.plain {
+  border: 0;
+  box-shadow: none; }
+
+.reveal a img {
+  -webkit-transition: all .15s linear;
+  -moz-transition: all .15s linear;
+  transition: all .15s linear; }
+
+.reveal a:hover img {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #bd1421;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.55); }
+
+/*********************************************
+ * NAVIGATION CONTROLS
+ *********************************************/
+.reveal .controls {
+  color: #bd1421; }
+
+/*********************************************
+ * PROGRESS BAR
+ *********************************************/
+.reveal .progress {
+  background: rgba(0, 0, 0, 0.2);
+  color: #bd1421; }
+
+.reveal .progress span {
+  -webkit-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  -moz-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
+
+/*********************************************
+ * PRINT BACKGROUND
+ *********************************************/
+@media print {
+  .backgrounds {
+    background-color: #f0f0f0; } }
+
+.reveal ul > li {
+  margin-bottom: 1em; }
+
+.reveal ol > li {
+  margin-bottom: 1em; }
+
+.reveal ul li li {
+  margin-bottom: 0.4em; }
+
+.reveal ol li li {
+  margin-bottom: 0.4em; }
+
+.reveal ul li ul {
+  margin-top: 0.4em; }
+
+.reveal ul li ol {
+  margin-top: 0.4em; }
+
+.reveal ol li ul {
+  margin-top: 0.4em; }
+
+.reveal ol li ol {
+  margin-top: 0.4em; }
+
+.reveal .slides .grid2x {
+  margin: 50px auto 50px auto;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start; }
+  .reveal .slides .grid2x img {
+    margin: 0 10px;
+    min-width: 0;
+    width: 100%; }
+
+.reveal .grid2x2 {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 90%;
+  margin: 0 auto; }
+  .reveal .grid2x2.half {
+    max-width: 60%; }
+  .reveal .grid2x2 .grid-item {
+    width: 50%; }
+    .reveal .grid2x2 .grid-item img {
+      margin: 20px;
+      width: calc(100% - (20px * 2)); }
+
+.reveal .backgrounds iframe {
+  -webkit-transform: scale(0.75) translate(-16%, -16%);
+  -moz-transform: scale(0.75) translate(-16%, -16%);
+  transform: scale(0.75) translate(-16%, -16%);
+  min-width: 150%;
+  min-height: 150%; }
+
+.reveal .slides {
+  text-align: left; }
+  .reveal .slides.centered {
+    text-align: center; }
+  .reveal .slides .centered {
+    text-align: center; }
+
+.reveal .slides img {
+  display: block;
+  margin: 50px auto 50px auto;
+  border: 10px solid #d2d2d2; }
+  .reveal .slides img.clean {
+    border: none;
+    background: none;
+    box-shadow: none; }
+
+.reveal a {
+  line-height: 1.3em;
+  text-decoration: underline;
+  font-style: italic; }
+
+.reveal .small {
+  font-size: 20px; }
+
+.reveal .has-dark-background h1,
+.reveal .has-dark-background h2,
+.reveal .has-dark-background h3,
+.reveal .has-dark-background h4,
+.reveal .has-dark-background h5,
+.reveal .has-dark-background h6 {
+  color: #f4d018; }
+
+.reveal .has-dark-background {
+  color: #f0f0f0; }
+
+span.emph {
+  font-weight: 600; }
+
+.alert {
+  font-weight: 600;
+  font-style: italic;
+  color: #bd1421; }
+
+.cite {
+  display: block;
+  float: right; }
+
+.reveal blockquote {
+  border: none;
+  box-shadow: none;
+  border-left: 10px solid #bdbdbd;
+  margin: 40px 0;
+  padding: 0 0 0 20px; }
+  .reveal blockquote > p {
+    margin: 0; }
+
+.grid {
+  /* Grid Fallback */
+  display: flex;
+  flex-wrap: wrap;
+  /* Supports Grid */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  grid-auto-rows: minmax(150px, auto);
+  grid-gap: 1em; }
+
+.grid_item {
+  /* Demo-Specific Styles */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Flex Fallback */
+  margin-left: 5px;
+  margin-right: 5px;
+  flex: 1 1 200px; }
+
+/* If Grid is supported, remove the margin we set for the fallback */
+@supports (display: grid) {
+  .grid_item {
+    margin: 0; } }

@@ -1,0 +1,310 @@
+Script started on 2023-03-25 20:45:39+02:00 [<not executed on terminal>]
+{
+  "name": "reveal.js",
+  "version": "4.4.0",
+  "description": "The HTML Presentation Framework",
+  "homepage": "https://revealjs.com",
+  "subdomain": "revealjs",
+  "main": "dist/reveal.js",
+  "module": "dist/reveal.esm.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "gulp test",
+    "start": "gulp serve",
+    "build": "gulp build"
+  },
+  "author": {
+    "name": "Hakim El Hattab",
+    "email": "hakim.elhattab@gmail.com",
+    "web": "https://hakim.se"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hakimel/reveal.js.git"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "keywords": [
+    "reveal",
+    "slides",
+    "presentation"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.14.3",
+    "@babel/eslint-parser": "^7.14.3",
+    "@babel/preset-env": "^7.14.2",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^19.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "babel-plugin-transform-html-import-to-string": "0.0.1",
+    "colors": "^1.4.0",
+    "core-js": "^3.12.1",
+    "fitty": "^2.3.0",
+    "glob": "^7.1.7",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^8.0.0",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-connect": "^5.7.0",
+    "gulp-eslint": "^6.0.0",
+    "gulp-header": "^2.0.9",
+    "gulp-tap": "^2.0.0",
+    "gulp-zip": "^4.2.0",
+    "highlight.js": "^10.0.3",
+    "marked": "^4.0.12",
+    "node-qunit-puppeteer": "^2.1.0",
+    "qunit": "^2.17.2",
+    "rollup": "^2.48.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "sass": "^1.39.2",
+    "yargs": "^15.1.0"
+  },
+  "browserslist": "> 2%, not dead",
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es6": true
+    },
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+      "sourceType": "module",
+      "allowImportExportEverywhere": true,
+      "requireConfigFile": false
+    },
+    "globals": {
+      "module": false,
+      "console": false,
+      "unescape": false,
+      "define": false,
+      "exports": false
+    },
+    "rules": {
+      "curly": 0,
+      "eqeqeq": 2,
+      "wrap-iife": [
+        2,
+        "any"
+      ],
+      "no-use-before-define": [
+        2,
+        {
+          "functions": false
+        }
+      ],
+      "new-cap": 2,
+      "no-caller": 2,
+      "dot-notation": 0,
+      "no-eq-null": 2,
+      "no-unused-expressions": 0
+    }
+  }
+}
+[1m[7m%[27m[1m[0m                                                                                ]2;fgogianu@fgogianu-l:~/Code/github/the-library-of-babel/2023_mar_nec]1;../2023_mar_nec[0m[27m[24m[J
+[1m[36m2023_mar_nec[0m[36m[39m[1m [0m[1mvia [0m[1m[34m🅒 base[0m[34m[39m[1m [0m[1m[39m…[0m[39m[1m[37m
+[0m[37m[39m[1m[32m➜ [0m[32m[39m[K[77C[1A[1B[77D[?1h=[?2004h{[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "name": "reveal.js",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "version": "4.4.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "description": "The HTML Presentation Framework",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "homepage": "https://revealjs.com",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "subdomain": "revealjs",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "main": "dist/reveal.js",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "module": "dist/reveal.esm.js",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "license": "MIT",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "scripts": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "test": "gulp test",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "start": "gulp serve",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "build": "gulp build"[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   },[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "author": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "name": "Hakim El Hattab",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "email": "hakim.elhattab@gmail.com",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "web": "https://hakim.se"[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   },[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "repository": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "type": "git",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "url": "git://github.com/hakimel/reveal.js.git"[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   },[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "engines": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "node": ">=10.0.0"[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   },[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "keywords": [[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "reveal",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "slides",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "presentation"[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   ],[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "devDependencies": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "@babel/core": "^7.14.3",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "@babel/eslint-parser": "^7.14.3",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "@babel/preset-env": "^7.14.2",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "@rollup/plugin-babel": "^5.3.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "@rollup/plugin-commonjs": "^19.0.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "@rollup/plugin-node-resolve": "^13.0.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "babel-plugin-transform-html-import-to-string": "0.0.1",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "colors": "^1.4.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "core-js": "^3.12.1",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "fitty": "^2.3.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "glob": "^7.1.7",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "gulp": "^4.0.2",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "gulp-autoprefixer": "^8.0.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "gulp-clean-css": "^4.2.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "gulp-connect": "^5.7.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "gulp-eslint": "^6.0.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "gulp-header": "^2.0.9",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "gulp-tap": "^2.0.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "gulp-zip": "^4.2.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "highlight.js": "^10.0.3",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "marked": "^4.0.12",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "node-qunit-puppeteer": "^2.1.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "qunit": "^2.17.2",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "rollup": "^2.48.0",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "rollup-plugin-terser": "^7.0.2",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "sass": "^1.39.2",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "yargs": "^15.1.0"[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   },[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "browserslist": "> 2%, not dead",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h   "eslintConfig": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "env": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "browser": true,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "es6": true[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     },[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "parser": "@babel/eslint-parser",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "parserOptions": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "sourceType": "module",[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "allowImportExportEverywhere": true,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "requireConfigFile": false[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     },[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "globals": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "module": false,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "console": false,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "unescape": false,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "define": false,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "exports": false[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     },[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     "rules": {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "curly": 0,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "eqeqeq": 2,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "wrap-iife": [[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h         2,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h         "any"[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       ],[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "no-use-before-define": [[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h         2,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h         {[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h           "functions": false[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h         }[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       ],[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "new-cap": 2,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "no-caller": 2,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "dot-notation": 0,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "no-eq-null": 2,[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h       "no-unused-expressions": 0[?1l>[?2004l
+[0m[27m[24m[J[1m[33m➜ [0m[33m[39m[K[?1h=[?2004h     }[?1l>[?2004l
+]2;{ "name": "reveal.js",; "version": "4.4.0",; "description": ; "homepage": ;  }]1;{zsh: command not found: name:
+zsh: command not found: version:
+zsh: command not found: description:
+zsh: command not found: homepage:
+zsh: command not found: subdomain:
+zsh: command not found: main:
+zsh: command not found: module:
+zsh: command not found: license:
+zsh: command not found: scripts:
+zsh: command not found: test:
+zsh: command not found: start:
+zsh: command not found: build:
+zsh: command not found: },
+zsh: command not found: author:
+zsh: command not found: name:
+zsh: command not found: email:
+zsh: command not found: web:
+zsh: command not found: },
+zsh: command not found: repository:
+zsh: command not found: type:
+zsh: command not found: url:
+zsh: command not found: },
+zsh: command not found: engines:
+zsh: command not found: node:
+zsh: command not found: },
+zsh: command not found: keywords:
+zsh: command not found: reveal,
+zsh: command not found: slides,
+zsh: command not found: presentation
+zsh: command not found: ],
+zsh: command not found: devDependencies:
+zsh: no such file or directory: @babel/core:
+zsh: no such file or directory: @babel/eslint-parser:
+zsh: no such file or directory: @babel/preset-env:
+zsh: no such file or directory: @rollup/plugin-babel:
+zsh: no such file or directory: @rollup/plugin-commonjs:
+zsh: no such file or directory: @rollup/plugin-node-resolve:
+zsh: command not found: babel-plugin-transform-html-import-to-string:
+zsh: command not found: colors:
+zsh: command not found: core-js:
+zsh: command not found: fitty:
+zsh: command not found: glob:
+zsh: command not found: gulp:
+zsh: command not found: gulp-autoprefixer:
+zsh: command not found: gulp-clean-css:
+zsh: command not found: gulp-connect:
+zsh: command not found: gulp-eslint:
+zsh: command not found: gulp-header:
+zsh: command not found: gulp-tap:
+zsh: command not found: gulp-zip:
+zsh: command not found: highlight.js:
+zsh: command not found: marked:
+zsh: command not found: node-qunit-puppeteer:
+zsh: command not found: qunit:
+zsh: command not found: rollup:
+zsh: command not found: rollup-plugin-terser:
+zsh: command not found: sass:
+zsh: command not found: yargs:
+zsh: command not found: },
+zsh: command not found: browserslist:
+zsh: command not found: eslintConfig:
+zsh: command not found: env:
+zsh: command not found: browser:
+zsh: command not found: es6:
+zsh: command not found: },
+zsh: command not found: parser:
+zsh: command not found: parserOptions:
+zsh: command not found: sourceType:
+zsh: command not found: allowImportExportEverywhere:
+zsh: command not found: requireConfigFile:
+zsh: command not found: },
+zsh: command not found: globals:
+zsh: command not found: module:
+zsh: command not found: console:
+zsh: command not found: unescape:
+zsh: command not found: define:
+zsh: command not found: exports:
+zsh: command not found: },
+zsh: command not found: rules:
+zsh: command not found: curly:
+zsh: command not found: eqeqeq:
+zsh: command not found: wrap-iife:
+zsh: command not found: 2,
+zsh: command not found: any
+zsh: command not found: ],
+zsh: command not found: no-use-before-define:
+zsh: command not found: 2,
+zsh: command not found: functions:
+zsh: command not found: ],
+zsh: command not found: new-cap:
+zsh: command not found: no-caller:
+zsh: command not found: dot-notation:
+zsh: command not found: no-eq-null:
+zsh: command not found: no-unused-expressions:
+[1m[7m%[27m[1m[0m                                                                                ]2;fgogianu@fgogianu-l:~/Code/github/the-library-of-babel/2023_mar_nec]1;../2023_mar_nec[0m[27m[24m[J
+[1m[36m2023_mar_nec[0m[36m[39m[1m [0m[1mvia [0m[1m[34m🅒 base[0m[34m[39m[1m [0m[1m[39m…[0m[39m[1m[37m
+[0m[37m[39m[1m[31m➜ [0m[31m[39m[K[77C[1A[1B[77D[?1h=[?2004h   }[?1l>[?2004l
+zsh: parse error near `}'
+[1m[7m%[27m[1m[0m                                                                                ]2;fgogianu@fgogianu-l:~/Code/github/the-library-of-babel/2023_mar_nec]1;../2023_mar_nec[0m[27m[24m[J
+[1m[36m2023_mar_nec[0m[36m[39m[1m [0m[1mvia [0m[1m[34m🅒 base[0m[34m[39m[1m [0m[1m[39m…[0m[39m[1m[37m
+[0m[37m[39m[1m[31m➜ [0m[31m[39m[K[77C[1A[1B[77D[?1h=[?2004h}[?1l>[?2004l
+zsh: parse error near `}'
+[1m[7m%[27m[1m[0m                                                                                ]2;fgogianu@fgogianu-l:~/Code/github/the-library-of-babel/2023_mar_nec]1;../2023_mar_nec[0m[27m[24m[J
+[1m[36m2023_mar_nec[0m[36m[39m[1m [0m[1mvia [0m[1m[34m🅒 base[0m[34m[39m[1m [0m[1m[39m…[0m[39m[1m[37m
+[0m[37m[39m[1m[31m➜ [0m[31m[39m[K[77C[1A[1B[77D[?1h=[?2004h[A[A[0m[27m[24m[J
+[1m[36m2023_mar_nec[0m[36m[39m[1m [0m[1mon [0m[1m[37m[1m[37m[35m master[0m[35m[39m[1m[31m [!?][0m[31m[39m[0m[39m[1m [0m[1mis [0m[1m[31m📦 4.4.0[0m[31m[39m[1m [0m[1mvia [0m[1m[34m🅒 base[0m[34m[39m[1m [0m[1m[39m…[0m[39m[1m[37m
+[0m[37m[39m[1m[31m➜ [0m[31m[39m[K[77C[1A[1B[77D[?2004l
+
+Script done on 2023-03-25 20:45:41+02:00 [COMMAND_EXIT_CODE="127"]

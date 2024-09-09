@@ -1,0 +1,989 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>Introduction to RL</title>
+
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/rl.css">
+
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section id="title-slide" class="standout" data-background-color="#282a36" data-background="./img/blue_galactic_neural_nets.jpg">
+        <h1>Introduction to RL</h1>
+        <p>Florin Gogianu</p>
+      </section>
+
+
+      <section data-markdown>
+        <textarea data-template>
+          ## Resources
+          <br><br>
+
+          **Textbooks:**
+          - Sutton, _Reinforcement Learning: An Introduction_, 2nd edition
+          - Pineau, _An introduction to Deep RL_
+          - Szepesvari, _Algorithms for Reinforcement Learning_
+
+          ---
+          ## Resources
+          <br><br>
+
+          **Online lectures**:
+
+          - [Udacity, Reinforcement Learning](https://www.udacity.com/course/reinforcement-learning--ud600)
+          - [DeepMind, Advanced DL and RL](https://github.com/enggen/DeepMind-Advanced-Deep-Learning-and-Reinforcement-Learning)
+          - [Silver, Introduction to RL](https://youtu.be/2pWv7GOvuf0)
+        </textarea>
+      </section>
+
+      
+
+      <section data-background-iframe="https://spinningup.openai.com/en/latest/spinningup/keypapers.html"
+          data-background-interactive>
+      </section>
+
+
+      <section>
+          <h2>Evaluation</h2>
+          <div class="center">
+            <div class="grid c2">
+              <img src="./img/crafter_gameplay.gif" alt="">
+              <div class="div" style="text-align: justify;">
+                <p>Train an agent to solve <a href="https://github.com/danijar/crafter">Crafter</a>!</p>
+                <p>You will need to provide a report containing:</p>
+                <ul>
+                  <li>proper evaluation curves of the trained agents</li>
+                  <li>description of the algorithms</li>
+                  <li>interesting behaviours you observed</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+      </section>
+      
+
+      <section data-background="/img/covers.png" data-background-size="50%"></section>
+
+
+      <section data-background="/img/td_gammon.png" data-background-size="50%"></section>
+
+
+      <section data-background="/img/learned_plasma_control.gif" data-background-size="75%">
+        <a href="https://deepmind.google/discover/blog/accelerating-fusion-science-through-learned-plasma-control/">Learned plasma control, DeepMind, 2022</a>
+      </section>
+      <!-- <section data-background="/img/open_ended_world.png" data-background-size="75%"></section> -->
+      
+
+
+      <section data-background="/img/prefix_rl.png" data-background-size="50%">
+        <a href="https://arxiv.org/abs/2205.07000">Designing arithmetic circuits, NVIDIA, 2022</a>
+      </section>
+
+
+      <section class="standout" data-background-color="#282a36">
+        <h2>What is Reinforcement Learning?</h2>
+      </section>
+      
+
+
+      <section data-markdown>
+        <textarea data-template>
+          ## Reinforcement Learning vs. other learning paradigms
+          </br><br>
+
+          - **Supervised learning:** mapping from data to values or classes, requires
+              <span class="alert">labeled</span> data.
+          - **Unsupervised learning:** mapping from data to 
+              <span class="alert">interesting</span> patterns.
+
+          
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/action_perception_loop.png" data-background-size="70%" -->
+
+
+
+          ---
+          ## Reinforcement Learning vs. other learning paradigms
+          </br><br>
+
+          **By contrast, RL differes in that**:
+
+          - it is essentially an <span class="alert">online</span> setting
+          - data is highly <span class="alert">correlated</span> in time
+          - data distribution <span class="alert">changes</span> depending on the actions
+          - there is no labeled data, only a <span class="alert">reward</span> signal
+          - reward may be <span class="alert">delayed</span>
+
+
+
+          ---
+          <!-- .slide: data-background-interactive data-background-iframe="https://www.youtube.com/embed/kopoLzvh5jY" -->
+          
+
+
+          ---
+          ## <span class="alert">Reward</span> hypothesis:</h3>
+          <br><br>
+
+          <q>Any goal can be formalized as the outcome of maximizing a cumulative reward.</q>
+
+          </br>
+          <p class="fragment">See also the General Value Function framework.</p>
+
+
+
+          ---
+          ## Definitions
+          </br><br>
+
+          <br>
+          <q>Reinforcement learning is learning what to do - how to map situations to
+          actions - so as to maximize a numerical reward signal.</q>
+
+          <small class="cite">(<span class="alert">Sutton</span>, 2019)</small>
+
+          <br>
+
+          <q>Science of learning to make decisions from interaction</q>
+
+          <small class="cite">(<span class="alert">van Hasselt</span>, 2019)</small>
+
+          
+          ---
+          <div class="vcenter hcenter">
+            $$
+            \xi(\pi)=\sum_{\mu \in \mathcal{M}} 2^{-K(\mu)} V_{\mu}^{\pi}
+            $$
+            
+            <br><br>
+            <span class="alert">Intelligence</span> measures an agent's ability to achieve goals in a wide range of environments.
+            <p style="text-align: right;">
+              <small class="cite">(<span class="alert">Legg & Hutter</span>, 2007)</small>
+            </p>
+          </div>
+
+
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/action_perception_loop.png" data-background-size="70%" -->
+
+          
+
+          ---
+          ### Concepts
+          <div class="vcenter hcenter">
+            <ul>
+              <li><span class="alert">Reward</span> $R_t$. Scalar signal, performance at step $t$.</li>
+              <li><span class="alert">Action</span> $A_t$. Action taken by the agent according to:</li>
+              <ul>
+                <li><span class="alert">Deterministic</span> policy $a_t = \pi(s_t)$.</li>
+                <li><span class="alert">Stochastic</span> policy $a_t \sim \pi(a_t | s_t)$</li>
+              </ul>
+              <li><span class="alert">State</span> $S_t$. Internal state of the environment.</li>
+              <li><span class="alert">Observation</span> $O_t.$ High-dimensional vector, different from the environment state.</li>
+            </ul>
+          </div>
+          
+        </textarea>
+      </section>
+
+
+
+      <section data-transition="none">
+        <h2>The <span class="alert">environment</span></h2>
+        <img src="./img/env.png" width="75%" alt="environment">
+      </section>
+      <section data-transition="none">
+        <h2>The environment. <span class="alert">Transition</span> probability.</h2>
+        <img src="./img/env_transition_matrix.png" width="75%" alt="env_transition_matrix">
+      </section>
+      <section data-transition="none">
+        <h2>The environment. <span class="alert">Reward</span> function.</h2>
+        <img src="./img/env_transition_reward_matrix.png" width="75%" alt="env_transition_reward_matrix">
+      </section>
+      <section data-transition="none">
+        <h2>The environment</h2>
+        <br><br><br>
+        The dynamics of the MDP is defined by:
+        $$
+          p(s', r | s, a) \doteq \text{Pr} \{S_t = s', R_t = r \;\vert\; S_{t-1} = s, A_{t-1} = a \}
+        $$
+
+        From it we can compute state-transition probabilities:
+        $$
+          p(s' | s, a) \doteq \sum_{r \in \mathcal{R}} p(s', r | s, a)
+        $$
+
+        Or expected rewards for state-action pairs:
+        $$
+          r(s, a) \doteq \sum_{r \in \mathcal{R}} r \sum_{s' \in \mathcal{S}}  p(s', r | s, a)
+        $$
+
+        <p class="fragment alert"> we rarely have access to the dynamics!</p>
+
+      </section>
+
+      
+
+      <section data-background="/img/action_perception_loop.png" data-background-size="75%"></section>
+
+
+
+      <section data-markdown>
+        <textarea data-template>
+
+          <!-- .slide: data-background-color="#fff" data-background="./img/partial_value_fn.png" data-background-size="30%" -->
+          ---
+
+
+
+          ## The return
+          <br><br><br>
+
+          Return: $G_t = R_{t+1} + R_{t+2} + R_{t+3} ... $
+          
+          <div class="fragment">
+            </br>
+            <span class="alert">Discounted</span> return:
+
+            $$G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... \\;,$$
+
+            where $\gamma$ controls for how much emphasis is put on immediate reward.
+          </div>
+
+          <div class="fragment">
+            <br>
+            <span class="alert">Recursively</span>: $G_t = R_{t+1} + \gamma G_{t+1}$
+          </div>
+          
+
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/gt.png" data-background-size="30%" -->
+
+
+          ---
+          ## Value Functions
+          </br><br><br>
+
+          `$$
+          \begin{aligned}
+            v^{\pi}(s) 
+              & = \mathbb E_{\pi} [R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... + \gamma^{T-1} R_{T} | S_t = s, \pi] \\
+              & = \mathbb E_{\pi} [R_{t+1} + \gamma G_{t+1} | S_t = s, \pi] \\
+          \end{aligned}
+          $$`
+
+          <br>
+
+          - The value is the expected <span class="alert">return</span>, following the policy $\pi$
+          - Value functions are used to evaluate the utility of a state...
+          - ...and to select between actions.
+
+
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/expectation_over_gt.png" data-background-size="30%" -->
+
+
+
+          ---
+          ## <span class="alert">Bellman</span> equation
+          </br><br><br>
+
+          Since the return $G_t$ has a recursive form,
+
+          `$$
+          \begin{aligned}
+              v^{\pi}(s)
+              & = \mathbb E_{\pi} [R_{t+1} + \gamma G_{t+1} | S_t = s, \pi] \\
+              & = \mathbb E_{\pi} [R_{t+1} + \gamma v^{\pi}(s_{t + 1}) | S_t = s, \pi] \\
+          \end{aligned}
+          $$`
+
+          And this holds for the <span class="alert">optimal</span> value also:
+
+          `$$
+              v^*(s) = \text{max}_a \mathbb{E} [R_{t+1} + \gamma v^*(s_{t + 1}) | S_t = s, a=a]
+          $$`
+
+
+
+          ---
+          ## Action-Value Function
+          </br><br>
+
+          `$$
+              q^{\pi}(s,a) = \mathbb E_{\pi} [R_{t+1} + \gamma G_{t+1} | S_t = s, A_t = a, \pi]
+          $$`
+
+          It's related to the value function in that:
+          `$$
+              v^{\pi}(s) = \mathbb{E}_{a \sim \pi} [q^{\pi}(s,a)]
+          $$`
+
+
+
+          ---
+          ## Policy Evaluation
+          </br><br>
+
+          `$$
+          \begin{aligned} v_{\pi}(s) & \doteq \mathbb{E}_{\pi}\left[G_{t} | S_{t}=s\right] \\ &=\mathbb{E}_{\pi}\left[R_{t+1}+\gamma G_{t+1} | S_{t}=s\right] \\ &=\mathbb{E}_{\pi}\left[R_{t+1}+\gamma v_{\pi}\left(S_{t+1}\right) | S_{t}=s\right] \\ &=\sum_{a} \pi(a | s) \sum_{s^{\prime}, r} p\left(s^{\prime}, r | s, a\right)\left[r+\gamma v_{\pi}\left(s^{\prime}\right)\right] \end{aligned}
+          $$`
+
+
+
+          ---
+          ## Iterative Policy Evaluation
+          </br><br>
+
+          Imagine a succession of approximate value functions $v_0, v_1, v_2$:
+
+          `$$
+          \begin{aligned} 
+              v_{k+1}(s) 
+                  & \doteq \mathbb{E}_{\pi}\left[R_{t+1}+\gamma v_{k}\left(S_{t+1}\right) | S_{t}=s\right] \\
+                  &=\sum_{a} \pi(a | s) \sum_{s^{\prime}, r} p\left(s^{\prime}, r | s, a\right)\left[r+\gamma v_{k}\left(s^{\prime}\right)\right]
+          \end{aligned}
+          $$`
+
+          $v_k$ <span class="alert">can be shown to converge as</span> $k \to \infty$
+
+
+
+          ---
+          ## Policy Improvement
+          </br><br>
+
+          Say we determined $v_{\pi}$ for some arbitrary policy. Should we change the policy?
+
+          Would we get a better $v_{\pi}$?
+
+          `$$
+              \pi^{n e w}(. | s)=\arg \max _{a} Q^{\pi}(s, a)
+          $$`
+
+          It turns out this is <span class="alert">guaranteed</span> to be an improvement.
+
+
+
+          ---
+          <div class="vcenter">
+            <p>
+              $v^{\pi}(s), q^{\pi}(s,a), v^{\ast}(s), q^{\ast}(s,a)$ are <span class="alert">theoretical</span> objects</p>
+            <p>
+              While $V_{t}(s), Q_t(s,a)$ are their <span class="alert">estimates</span>.
+            </p>
+          </div>
+
+
+
+          ---
+          <!-- .slide: data-background-iframe="https://cs.stanford.edu/people/karpathy/reinforcejs/gridworld_dp.html" data-background-interactive -->
+
+          
+
+          ---
+          ### Generalized Policy Iteration
+          </br>
+
+          <img src="./img/gpi.png" alt="Generalized Policy Iteration" width="700px">
+
+        </textarea>
+      </section>
+
+      
+
+      <section data-markdown>
+        <textarea data-template>
+          ### Dynamic Programming
+          <br>
+
+          <img src="./img/dp.png" alt="Dynamic Programming" width="600px">
+
+          `$$
+          V(s_t) \leftarrow \sum_{a} \pi(a | s_t) \sum_{s^{\prime}, r} p\left(s^{\prime}, r | s_t, a\right)\left[r+\gamma V\left(s^{\prime}\right)\right]
+          $$`
+
+
+
+          ---
+          ### Monte Carlo
+          <br>
+
+          <img src="./img/monte_carlo.png" alt="Monte Carlo" width="600px">
+
+          `$$
+          V(s_t) \leftarrow V(s_t) + \alpha[G_t - V(s_t)]
+          $$`
+
+
+
+          ---
+          ### One-step Temporal Difference or TD(0)
+          <br>
+
+          <img src="./img/one_step_td.png" alt="Monte Carlo" width="600px">
+
+          `$$
+          V(s_t) \leftarrow V(s_t) + \alpha[r_{t+1} + \gamma V(s_{t+1}) - V(s_t)]
+          $$`
+
+
+
+          ---
+          ### Unified View
+          </br>
+
+          <img src="./img/unified_view.png" alt="Unified View" width="600px">
+
+        </textarea>
+      </section>
+      
+
+
+      <section class="standout" data-background-color="#282a36">
+        <h2>TD(0) methods for control</h2>
+      </section>
+
+      <section data-markdown>
+        <textarea data-template>
+          ## On-Policy Control
+          </br><br>
+
+          - take actions according to $\arg\max_a Q(S_t,A_t)$
+          - update the action state value using the <span class="alert">SARSA</span> update:
+
+          $$
+          Q\left(S_{t}, A_{t}\right) \leftarrow Q\left(S_{t}, A_{t}\right)+\alpha\left[R_{t+1}+\gamma Q\left(S_{t+1}, A_{t+1}\right)-Q\left(S_{t}, A_{t}\right)\right]
+          $$
+
+          <br>
+          <span class="alert">Intuition</span>: build a target based on the current reward and the next action-value and use the error term to increment the current estimate.
+
+
+
+
+          ---
+          ## Off-Policy Control
+          <br><br>
+
+          <span class="alert">Q-learning</span> update:
+          $$
+          Q(s_t, a_t) \leftarrow
+              Q(s_t, a_t) + \alpha[R_{t+1} + \gamma \mathop{\arg\max}\limits_{a_{t+1}} Q(s_{t+1},a_{t+1}) - Q(s_t, a_t)]
+          $$
+
+          <br><br>
+          <span class="alert">Expected SARSA</span> update:
+
+          `$$
+          \begin{aligned} 
+              Q\left(S_{t}, A_{t}\right) 
+                  & \leftarrow Q\left(S_{t}, A_{t}\right)+\alpha\left[R_{t+1}+\gamma \mathbb{E}_{\pi}\left[Q\left(S_{t+1}, A_{t+1}\right) | S_{t+1}\right]-Q\left(S_{t}, A_{t}\right)\right] \\
+                  & \leftarrow Q\left(S_{t}, A_{t}\right)+\alpha\left[R_{t+1}+\gamma \sum_{a} \pi\left(a | S_{t+1}\right) Q\left(S_{t+1}, a\right)-Q\left(S_{t}, A_{t}\right)\right]
+          \end{aligned}
+          $$`
+        </textarea>
+      </section>
+      
+
+      <section class="standout" data-background-color="#282a36">
+        <h2>So, is RL done?</h2>
+      </section>
+
+
+      <section class="standout" data-background-color="#282a36">
+        <h2 class="title">Value Function Approximation</h2>
+
+        <img class="clean" src="./img/function_approx.png" alt="Value Function Approximation" width="700px">
+      </section>
+
+
+      <section data-markdown>
+        <textarea data-template>
+          ## VFA Objective
+          </br><br>
+
+          `$$
+          \overline{\mathrm{VE}}(\mathbf{w}) \doteq \sum_{s \in \mathcal{S}} \mu(s)\left[v_{\pi}(s)-\hat{v}(s, \mathbf{w})\right]^{2}
+          $$`
+
+          - minimize the good old <span class="alert">Mean Squared Error</span>,
+          - weighted by the state distribution $\mu(s)$.
+          - SGD will converge to a <span class="alert">local</span> minimum,
+          - Linear VFA has only one local minimum.
+
+
+
+          ---
+          ## Stochastic gradient descent
+          </br><br>
+
+          `$$
+          \begin{aligned}
+              \mathbf{w}_{t+1}
+                  & \doteq \mathbf{w}_{t}-\frac{1}{2} \alpha \nabla\left[v_{\pi}\left(S_{t}\right)-\hat{v}\left(S_{t}, \mathbf{w}_{t}\right)\right]^{2} \\
+                  &=\mathbf{w}_{t}+\alpha\left[v_{\pi}\left(S_{t}\right)-\hat{v}\left(S_{t}, \mathbf{w}_{t}\right)\right] \nabla \hat{v}\left(S_{t}, \mathbf{w}_{t}\right)
+              \end{aligned}
+          $$`
+
+          This is <span class="alert">guaranteed</span> to converge as $\alpha \rightarrow 0$ under some conditions. 
+
+          <p class="fragment">But we generaly <span class="alert">don't know</span> $v_{\pi}(S_{t})$!</p>
+
+
+
+          ---
+          ## Monte Carlo VFA
+          <br><br>
+
+          <img src="./img/monte_carlo.png" alt="Monte Carlo" width="600px">
+
+          `$$
+              \mathbf{w} \leftarrow \mathbf{w}+\alpha\left[G_{t}-\hat{v}\left(S_{t}, \mathbf{w}\right)\right] \nabla \hat{v}\left(S_{t}, \mathbf{w}\right)
+          $$`
+
+
+
+          ---
+          ## One-step Temporal Difference VFA
+
+          <img src="./img/one_step_td.png" alt="Monte Carlo" width="600px">
+
+          `$$
+          \mathbf{w} \leftarrow \mathbf{w}+\alpha\left[R+\gamma \hat{v}\left(S^{\prime}, \mathbf{w}\right)-\hat{v}(S, \mathbf{w})\right] \nabla \hat{v}(S, \mathbf{w})
+          $$`
+
+          <p class="fragment">This is not a <span class="alert">full (true) gradient</span> anymore!</p>
+
+
+
+          ---
+          ## Semi-Gradient Methods
+          </br>
+
+          <div class="small">
+          $$
+          \mathbf{w} \leftarrow \mathbf{w}+\alpha\left[U_t-\hat{v}(S, \mathbf{w})\right] \nabla \hat{v}(S, \mathbf{w})
+          $$
+
+          - If $U_t$ is an <span class="alert">unbiased</span> estimate of $v^{\pi}(S_t)$, such as $G_t$, all good!
+
+          - When bootstrapping however: $U_t = R+\gamma \hat{v}\left(S^{\prime}, \mathbf{w}\right)$
+              - the <span class="alert">true gradient</span> update is: $\mathbf{w} \leftarrow \mathbf{w}+\alpha\left[U_t-\hat{v}(S, \mathbf{w})\right] (\nabla \hat{v}(S, \mathbf{w}) - \gamma \nabla \hat{v}(S_{t+1}, \mathbf{w}))$.
+              - the target depends on the current $\mathbf{w}$.
+
+          </div>
+
+          </br>
+          <span class="alert fragment">
+          Semi-gradient takes into account the effect of changing $\mathbf{w}$ on the estimate but ignore its effect on the target.
+          </span>
+
+
+
+          ---
+          ### Deadly triad (I)
+          </br>
+          </br>
+
+          - Function approximation
+          - Bootstrapping
+          - Off-policy training
+
+          <span class="cite">(<span class="alert">Sutton</span>, 2019 [11.3])</span>
+
+
+
+          ---
+          ### Before NN Approximators
+          </br>
+
+          Take a linear approximator:
+
+          `$$
+          \hat{v}(s, \mathbf{w}) \doteq \mathbf{w}^{\top} \Phi(s) \doteq \sum_{i=1}^{d} w_{i} \phi_{i}(s)
+          $$`
+
+          and compose it with some <span class="alert">non-linear</span> feature extractor $\Phi(s)$.
+
+          <p class="fragment">How about convergence? Gordon, 1999, shows Watkins & Dayan's results holds only for certain $\Phi(s)$.</p>
+
+
+
+          ---
+          ### Coarse coding example
+          </br><br>
+
+          <img src="./img/coarse_coding.png" alt="DQN" width="600px">
+
+
+
+          ---
+          <h3>Motivation</h3>
+
+          <div class="center">
+            <br>
+            <div class="grid c2">
+              <div>
+                <img src="./img/mspacman_01.png" width="80%" alt="">
+                <p>We need $V(s; \theta)$ learned on this image $s$...</p>
+              </div>
+              <div>
+                <img src="./img/mspacman_02.png" width="80%" alt="">
+                <p>To be similar for a new image $s$</p>
+              </div>
+          </div>
+
+
+
+          ---
+          ### Neural Fitted Q-Learning
+          </br><br>
+
+          1. Initialize a <span class="alert">neural network</spane> $Q(s, a; \theta)$
+          2. Collect $\mathcal{D} = \{<s, a, r, s^{\ast}>\}$
+          3. Build regression target: $Y_k^{Q} = r + \gamma \max_{a^{\ast}} Q(s^{\ast}, a^{\ast}; \theta_k)$
+          4. Minimize the loss:
+          `$$
+          \mathcal{L}_{\text{NFQ}} = \left[Q(s, a; \theta_k) - Y^{Q}_k \right]^2
+          $$`
+          5. repeat from (3)
+          6. repeat frpm (2)
+
+          <p class="fragment"><span class="alert">Problem: </span>Updating $\theta$ also updates the target.</p>
+
+          ---
+          ### Neural Fitted Q-Learning
+          <br><br>
+
+          <img src="./img/gpi.png" alt="DQN" width="700px">
+
+          NFQI alternates slowly between the two problems and therefore <span class="alert">converges slowly</span>.
+
+          </br><br>
+        </textarea>
+      </section>
+
+      
+      <section data-markdown>
+        <textarea data-template>
+          ### Deep Q-networks. Fix \#1: <span class="alert">target network</span>
+          </br><br>
+
+          <img src="./img/dqn_target_net.png" alt="DQN" width="600px">
+
+          <span class="alert">DQN</span> introduces a second neural network for computing the next state-action value.
+          
+          This network "follows" the online network.
+
+
+          
+          ---
+          ### Deep Q-networks. Fix \#2: <span class="alert">experience replay</span>
+          </br><br>
+
+          <img src="./img/action_perception_loop_er.png" alt="DQN" width="600px">
+
+          <br>
+
+          <span class="alert">DQN</span> uses a cyclic buffer named "Experience Replay" which allows for:
+
+          - training the NN function approximation with minim-batch gradient descent (as in NFQI)
+          - frequent policy improvement steps
+          
+
+
+          ---
+          ### Deep Q-networks. Objective and tweaks
+          </br>
+
+          <img src="./img/action_perception_loop_er.png" alt="DQN" width="600px">
+
+          </br>
+          <p class="small">
+          $$
+          \mathcal{L}_{\text{DQN}}(\boldsymbol{\theta})=\mathbb{E}_{\left(s, a, r, s^{\prime}\right) \sim U(\mathcal{D})}
+              \big[\underbrace{r+\gamma \max _{a^{\prime}} Q\left(s^{\prime}, a^{\prime} ; \boldsymbol{\theta}^{-}\right)}_{\text {refined estimate }}-\underbrace{Q(s, a ; \boldsymbol{\theta})}_{\text {current estimate }})^{2}\big]
+          $$
+          </p>
+
+          <ul style="font-size: 1.2rem;">
+            <li>rewards are clipped to $[-1, 1]$,</li>
+            <li>optimization algorithm used is RMSprop (and Adam, recently)</li>
+            <li>the cost function is Huber/Smooth L1</li>
+            <li>in some implementations the norm of the gradient is also clipped</li>
+          </ul>
+
+          
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/dqn_algo.png" data-background-size="50%" -->
+
+
+
+          ---
+          <!-- .slide: data-background-color="#0f132d" data-background="./img/atari_domain.png" data-background-size="50%" -->
+
+          
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/dqn_perf.png" data-background-size="60%" -->
+          
+
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/dqn_features.png" data-background-size="60%" -->
+
+
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/rainbow.png" data-background-size="40%" -->
+
+
+
+          ---
+          ## Action Overestimation
+          <br><br>
+
+          - random estimation errors
+          - the approximator is not expressible
+          - non-stationarity of the data
+          - the $\texttt{max}$ operator is <span class="alert">positively biased</span>
+
+
+
+          ---
+          ## Maximization bias (I)
+          </br><br>
+
+          Suppose $Q(s, a; \theta) + \epsilon$ with $\mu=0$:
+
+          <img class="clean" src="./img/ddqn_noise.png" alt="ddqn_noise">
+
+          the target can be overestimated up to
+
+          `$$
+              \gamma\epsilon\frac{m-1}{m+1}
+          $$`
+
+
+
+          ---
+          ## Maximization bias (II)
+          </br><br>
+
+          <img class="clean" src="./img/overestimation_tabular.png" alt="overestimation" width="600px">
+
+          </br>
+          Even in tabular settings!
+
+
+
+          ---
+          ## Double Q-learning
+          <br><br>
+
+          - Set two estimates, $Q_1(a), Q_2(a)$ and use them to:
+              - determine the maximizing action $A^{\ast} = \text{argmax}_{a} Q_1(a)$,
+              - estimate its value $Q_2(A^{\ast}) = Q_2(\text{argmax}_{a} Q_1(a))$,
+              - then randomly switch roles.
+
+          - In Double _Deep_ Q-Networks however:
+
+          `$$
+          Y_{k}^{D D Q N}=r+\gamma Q\left(s^{\prime}, \underset{a \in \mathcal{A}}{\operatorname{argmax}} Q\left(s^{\prime}, a ; \theta_{k}\right) ; \theta_{k}^{-}\right)
+          $$`
+
+
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/ddqn_results.png" data-background-size="60%" -->
+
+
+
+          ---
+          ## Dueling DQN (I)
+          <br><br>
+
+          - from the definition:
+
+          `$$
+              V^{\pi}(s) = \mathbb E_{a \sim \pi(s)} \,[Q^{\pi}(s,a)]
+          $$`
+
+          - derive the <span class="alert">advantage</span> some action has with respect to $V(s)$
+
+          `$$
+              A^{\pi}(s,a) = Q^{\pi}(s,a) - V^{\pi}(s)
+          $$`
+
+          - that is, for optimal action $a^{\ast}$: $A^{\pi}(s, a^{\ast}) = 0$
+
+
+
+          ---
+          ## Dueling DQN (II)
+          </br><br>
+
+          <img class="clean" src="./img/dueling_dqn.png" alt="dueling_dqn" width="400px">
+
+          - Naively:
+          `$$
+              Q(s,a; \theta, \alpha, \beta) = V(s;\theta, \beta) + A(s,a;\theta, \alpha)
+          $$`
+
+
+
+          ---
+          ## Dueling DQN (III)
+          <br><br>
+
+          - However we can't recover unique V and A so we force $A(s, a) = 0$ for the action taken:
+
+          `$$
+          \begin{aligned}
+              Q(s,a; \theta, \alpha, \beta) = & V(s;\theta, \beta) \\
+                  & + (A(s,a;\theta, \alpha) - \mathop{\max}\limits_{a'\in |\mathcal A|} A(s,a';\theta, \alpha))
+          \end{aligned}
+          $$`
+
+          - In practice:
+
+          `$$
+          \begin{aligned}
+          Q(s,a; \theta, \alpha, \beta) = & V(s;\theta, \beta) \\
+                  & + (A(s,a;\theta, \alpha) - \frac{1}{|\mathcal A|}\Sigma_{a'}A(s,a';\theta, \alpha))
+          \end{aligned}
+          $$`
+
+
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/dueling_saliency.png" data-background-size="40%" -->
+
+
+
+          ---
+          ## Prioritized Experience Replay
+          <br><br>
+
+          - Instead of sampling transitions <span class="alert">uniformly</span> from the ER...
+          - Sample those experiences from which the agent <span class="alert">would learn the most</span>.
+          - Specifically, sample $<s,a,r,s^{\ast}>$ tuples with a large absolute TD-error:
+
+          $$
+          \left|\left(r+\gamma \max _{a^{\prime}} Q\left(s^{\prime}, a^{\prime} ; \boldsymbol{\theta}^{-}\right)-Q(s, a ; \boldsymbol{\theta})\right)^{2}\right|
+          $$
+
+          <p class="fragment">Can we do better than $|\text{TD-error}|$?</p>
+
+
+
+          ---
+          ### Multi-step learning
+          <br><br>
+
+          Recall the <span class="alert">n-step </span> methods discussed earlier. We can change the target so that we bootstrapp <span class="alert">later in the future</span>:
+
+          `$$
+          Y_{k}^{Q, n}=\sum_{t=0}^{n-1} \gamma^{t} r_{t+k+1}+\gamma^{n} \max _{a^{\prime} \in A} Q\left(s_{n}, a^{\prime} ; \theta_{k}\right)
+          $$`
+
+
+
+          ---
+          ### Distributional RL
+          </br>
+
+          <img class="clean" src="./img/dist_actions.png" alt="distributional_actions" width="600px">
+
+          </br>
+
+          - Why learn point estimates of the value-functions?
+          - Why not learn a <span class="alert">distribution</span> of returns?
+
+
+
+          ---
+          ### Distributional Bellman operator
+          </br><br>
+
+          <img class="clean" src="./img/dist_bellman.png" alt="distributional_bellman" width="600px">
+
+          </br>
+
+          <ul>
+              <li class="fragment">define a <span class="alert">value distribution</span>: $Q^{\pi}(s, a)=\mathbb{E} Z^{\pi}(s, a)$</li>
+              <li class="fragment">which is also recursive: $Z^{\pi}(s, a)=R\left(s, a, S^{\prime}\right)+\gamma Z^{\pi}\left(S^{\prime}, A^{\prime}\right)$</li>
+              <li class="fragment">distributional loss: $D_{\mathrm{KL}}\left(\Phi {\mathcal{T}} Z_{\theta^-}(s, a) \| Z_{\theta}(s, a)\right)$</li>
+          </ul>
+          
+
+          ---
+          ### Yeah, but why?
+          </br>
+
+          <img class="clean" src="./img/dist_why.png" alt="distributional_but_why" width="700px">
+
+          Both the distributional and the point estimates have the same expected return!
+          
+
+
+          ---
+          <!-- .slide: data-background-color="#fff" data-background="./img/rainbow.png" data-background-size="40%" -->
+
+        </textarea>
+      </section>
+
+
+      <section class="standout" data-background-color="#282a36">
+        <h2>Questions?</h2>
+      </section>
+
+    </div>
+  </div>
+
+  <!--   
+  End of content happens here.
+  -->
+
+  <script src="dist/reveal.js"></script>
+  <!-- <script src="plugin/notes/notes.js"></script> -->
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script src="plugin/math/math.js"></script>
+  <script src="plugin/animate/plugin.js"></script>
+  <script src="plugin/animate/svg.min.js"></script>
+
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      width: 1280,
+      height: 800,
+      // center: false,
+      hash: true,
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealMath.KaTeX, RevealAnimate, RevealHighlight]
+    });
+  </script>
+</body>
+
+</html>

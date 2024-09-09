@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf8">
+    <title>Spatial Transformer Networks | Florin Gogianu</title>
+    <meta name="description" content="A wrapper over react.js">
+    <meta name="author" content="Tudor Berariu, Florin Gogianu">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+    <link rel="stylesheet" href="css/main.css">
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section data-background="img/hero.jpg" class="left">
+          <h2>Spatial Transformer Networks</h2><small>Max Jaderberg, Karen Simonyan, Andrew Zisserman, Koray Kavukcuoglu</small>
+        </section>
+        <section class="left">
+          <h3 class="slide-title">Content</h3>
+          <ol>
+            <li>Limitations of Convolutional Nets</li>
+            <li>Spatial Transformer Networks</li>
+            <li>Results</li>
+            <li>Observations</li>
+          </ol>
+        </section>
+        <section class="left fragments">
+          <h3>Recognizing objects is difficult!</h3>
+          <ul>
+            <li class="fragment">Algorithms lack 3D cues</li>
+            <li class="fragment">Classes carry meaning</li>
+            <li class="fragment">Lighting effects</li>
+            <li class="fragment">Viewpoint changes </li>
+            <li class="fragment">Deformations</li>
+          </ul>
+          <p class="right fragment"><small>(Hinton, 2012)</small></p>
+        </section>
+        <section class="left fragments">
+          <h3>How CNNs achieve translation invariance?</h3>
+          <ul>
+            <li class="fragment">CNNs present equivariance at the feature detector level... </li>
+            <li class="fragment">...and limited translation invariance across multiple convolution and pooling layers</li>
+            <li class="fragment">But they're "doomed" because they don't preserve spatial relations</li>
+          </ul>
+          <p class="right fragment"><small>(Hinton, 2012)</small></p>
+        </section>
+        <section class="left fragments">
+          <h3>Brute Force - Data Augmentation</h3>
+          <ul>
+            <li class="fragment"><span class="cite">Ciresan, 2010 </span><span>- MNIST training set is distorted at each epoch with affine transformations + elastic deformations emulating uncontrolled oscillations of hand muscles</span></li>
+            <li class="fragment">0.35% error rate on MNIST</li>
+          </ul>
+        </section>
+        <section data-background="img/augmentation.jpg" data-background-repeat="repeat" data-background-size="600px" data-background-transition="zoom" class="left"></section>
+        <section class="left fragments">
+          <h3>Brute Force - Data Augmentation</h3>
+          <ul>
+            <li> <span class="cite">Baidu Research, 2015 </span><span>- Augmentation and training on a 36 nodes cluster with 144 GPUs  </span>
+              <table style="width: 60%;font-size: 80%" class="fragment">
+                <thead>
+                  <tr>
+                    <th>Augmentation</th>
+                    <th>Possible changes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Color Casting</td>
+                    <td>68,920</td>
+                  </tr>
+                  <tr>
+                    <td>Vignetting</td>
+                    <td>1,960</td>
+                  </tr>
+                  <tr>
+                    <td>Lens Distorsion</td>
+                    <td>2,60</td>
+                  </tr>
+                  <tr>
+                    <td>Rotation</td>
+                    <td>20</td>
+                  </tr>
+                  <tr>
+                    <td>Flipping</td>
+                    <td>2</td>
+                  </tr>
+                  <tr>
+                    <td>Cropping</td>
+                    <td>82,944</td>
+                  </tr>
+                </tbody>
+              </table>
+            </li>
+            <li class="fragment">5.98% error rate on ImageNet</li>
+          </ul>
+        </section>
+        <section class="left fragements">
+          <h3>Related work. General discussion</h3>
+          <ul>
+            <li class="fragment"><span class="cite">Hinton, 2011 </span><span>- Transforming auto-encoders</span></li>
+            <li class="fragment">Taken further by <span class="cite">Tieleman, 2014</span></li>
+            <li class="fragment">These tehniques learn features from transformation supervision</li>
+          </ul>
+        </section>
+        <section class="left fragements">
+          <h3>Related work. Transforming Feature Maps</h3>
+          <ul>
+            <li class="fragment"><span class="cite">Lenc & Vedald, 2015 </span><span>- Understanding image representations by measuring their equivariance and equivalence</span></li>
+            <li class="fragment"><span class="cite">Gens & Domingos, 2014 </span><span>- Deep symmetry networks. </span><span>The transformations in the affine group are applied to feature maps.</span></li>
+            <li class="fragment">There's an entire class of CNN variations modified to achieve spatial invariance by transforming the feature maps.</li>
+          </ul>
+        </section>
+        <section class="left">
+          <h2>Spatial Transformer Networks</h2>
+          <p>Architecture</p>
+        </section>
+        <section data-background="#FFF" class="left">
+          <h3>Spatial Transformer Module</h3><img src="img/spatial_transformer.png">
+        </section>
+        <section class="left fragments">
+          <h3>1. Localization Network</h3>
+          <ul>
+            <li class="fragment">Takes a $\mathrm{U} \in \mathbb{R}^{H x W x C}$ tensor...</li>
+            <li class="fragment">...and learns $\theta$ parameters</li>
+            <li class="fragment">Can be either a FCN or a CNN...</li>
+            <li class="fragment">...but it needs to include a final regression layer to produce the transformation parameters $\theta$</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3>2. Parameterised Sampling Grid</h3>
+          <ul>
+            <li class="fragment">Warps the input by applying to each pixel a sampling kernel centered at a particular location</li>
+            <li class="fragment">Output pixels are defined to lie on a regular grid $G =\{G_i\}$ of pixels $G_i = (x_i^t,y_i^t)$</li>
+            <li class="fragment">Both source and target coordinates are normalized</li>
+          </ul>
+        </section>
+        <section data-background="#FFF">
+          <h3 class="left">2. PSG - Affine Transformation</h3><img src="img/sampling_grid.png" style="max-width: 70%; margin: 0 auto">
+          <p style="font-size: 70%;">
+            $$\begin{pmatrix} x_i^s \\ y_i^s \end{pmatrix}= \mathcal{T}(G_i) =
+            \mathrm{A}_{\theta}\begin{pmatrix} x_i^t \\ y_i^t \\ 1 \end{pmatrix} =
+            \begin{bmatrix} \theta_{11} & \theta_{12} & \theta_{13} \\ \theta_{21}
+            & \theta_{22} & \theta_{23} \end{bmatrix} \begin{pmatrix} x_i^t \\
+            y_i^t \\ 1 \end{pmatrix}$$
+          </p>
+        </section>
+        <section class="left fragments">
+          <h3>2. PSG - Beyond Affine</h3>
+          <ul>
+            <li class="fragment">The class of transformations can be more constrained, as used for attention.</li>
+            <li class="fragment">Or more general: Eg. eight parameters can encode plane projective transformations and thin plate spline transformations.</li>
+            <li class="fragment">In fact it can have any parameterised form, provided that is differnetiable with respect to the parameters...</li>
+            <li class="fragment">...so that we can backpropagate the gradients.</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3>3. Differentiable Image Sampling</h3>
+          <p style="font-size: 60%;" class="fragment">Because we move pixels around during a transformation, we need to sample them.</p>
+          <p style="font-size: 60%;" class="fragment">A sampler must take the set of sampling points $\mathcal{T}_{\theta}(G)$, along with input U and produce the sampled output V.</p>
+          <p style="font-size: 60%;" class="fragment">
+
+            $$V_i^c = \displaystyle\sum_{n}^{H} \displaystyle\sum_{m}^{W}
+            U^{c}_{nm} k(x_i^s - m; \mathbf{\Phi}_x)k(y_i^s - n; \mathbf{\Phi}_y)
+            \quad \forall i \in [1 \ldots H'W'] \quad \forall c \in [1 \ldots C]$$
+          </p>
+          <p style="font-size: 60%;" class="fragment">$\phi_x$ and $\phi_y$ are the parameters of a generic sample kernel $k()$ which defines the image interpolation</p>
+        </section>
+        <section class="left">
+          <h3>3. Example - Integer Sampling Kernel</h3>
+          <p style="font-size: 60%;">Copy the value at the nearest pixel to $(x_i^s,y_i^s)$ to the output location $(x_i^s,y_i^s)$</p>
+          <p style="font-size: 70%;">
+            $$V_i^c = \displaystyle\sum_{n}^{H} \displaystyle\sum_{m}^{W}
+            U^{c}_{nm} \delta(\lfloor x_i^s + 0.5 \rfloor -m)
+            \delta(\lfloor y_i^s + 0.5 \rfloor -n)$$
+          </p>
+          <ul class="fragments">
+            <li class="fragment">$\lfloor x + 0.5\rfloor$ rounds $x$ to the nearest integer.</li>
+            <li class="fragment">$\delta()$ is the Kronecker delta function.</li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3>3. Real deal - Bilinear Sampling Kernel</h3>
+          <div><img src="img/bilinear_interpolation.png" style="max-width: 30%; float: left; background-color: #FFF">
+            <div style="float: right; max-width: 65%;">
+              <p style="font-size: 60%;">
+                $$V_i^c = \displaystyle\sum_{n}^{H} \displaystyle\sum_{m}^{W}
+                U^{c}_{nm} \max (0, 1 - \vert x_i^s - m \vert) \max (0, 1 - \vert y_i^s -n \vert)$$
+              </p>
+              <ul class="fragments">
+                <li class="fragment">$\max (0, 1 - \vert x_i^s - m \vert)$ makes sure we only look at the four adjacent pixels.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section class="left">
+          <h3>Differentiability with respect to $U$ </h3>
+          <p style="font-size: 80%;">
+            $$\frac{\partial V_i^c}{\partial U^c_{nm}} =
+            \displaystyle\sum_{n}^{H} \displaystyle\sum_{m}^{W}
+            \max (0, 1 - \vert x_i^s - m \vert) \max (0, 1 - \vert y_i^s -n \vert)$$
+          </p>
+        </section>
+        <section class="left">
+          <h3>Differentiability with respect to $G$ </h3>
+          <p style="font-size: 70%;">
+            $$\frac{\partial V_i^c}{\partial x_i^s} =
+            \displaystyle\sum_{n}^{H} \displaystyle\sum_{m}^{W}
+            U^{c}_{nm}\max (0, 1 - \vert y_i^s -n \vert)
+            \begin{cases} 0 & \text{if} \; \vert m - x_i^s \vert \ge 1 \\
+            1 & \text{if} \; m \ge x_i^s \\ -1 & \text{if} \; m < x_i^s \end{cases}$$
+          </p>
+          <ul>
+            <li class="fragment">Any sampling kernel works as long as subgradients can be defined with respect to $G$</li>
+            <li class="fragment">The affine transformation also needs to be differentiable so that we backpropagate the loss gradients back to the transformation parameters $\theta$</li>
+          </ul>
+        </section>
+        <section data-background="#FFF" class="left">
+          <p>The combination of localisation network, grid generator, and sampler forms a spatial transformer.</p><img src="img/spatial_transformer.png">
+        </section>
+        <section class="left fragments">
+          <h3>Spatial Transformer Networks (I)</h3>
+          <ul>
+            <li class="fragment">Self-contained module that can be dropped into a CNN or FCN at any point...</li>
+            <li class="fragment">...and in any number</li>
+            <li class="fragment">Computationally very cheap</li>
+            <li class="fragment">Knoweledge of how to transform each training sample is cached in the weights of the localisation net...</li>
+            <li class="fragment">...and also in the weights of the layers previous to a ST</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3>Spatial Tranformer Networks (II)</h3>
+          <ul>
+            <li class="fragment">We can also feed the output of the localisation net, $\theta$ params, to the rest of the network, as it encodes transformation</li>
+            <li class="fragment">Multiple STNs in parallel, if there are multiple objects or parts of interest in a feature map...</li>
+            <li class="fragment">...this is also a limitation</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h2>Results</h2>
+          <ul>
+            <li class="fragment">MNIST</li>
+            <li class="fragment">Street View House Numbers</li>
+            <li class="fragment">Fine-Grained Classification</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3>MNIST - Setting</h3>
+          <ul>
+            <li class="fragment">Baseline FCN with two hidden layers and a classification layer.</li>
+            <li class="fragment">Baseline CNN with
+              <ul>
+                <li>9 x 9 convolutional layer, 2 x 2 max-pooling layer </li>
+                <li>7 x 7 convolutional layer, 2 x 2 max-pooling layer </li>
+                <li>classification layer</li>
+                <li>32 - 64 filters per layer</li>
+              </ul>
+            </li>
+            <li class="fragment">All networks use softmax and ReLU</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3>MNIST - Setting</h3>
+          <ul>
+            <li class="fragment">All STNs are placed at the front of the network</li>
+            <li class="fragment">STN localisation nets with:
+              <ul>
+                <li>FCN of 32 units</li>
+                <li>two 20-filter 5 x 5 convolutional layer</li>
+                <li>2 x 2 max-pooling </li>
+                <li>FCN of 20 units</li>
+              </ul>
+            </li>
+            <li class="fragment">All networks contain the same no of learnable params ~ 400k</li>
+          </ul>
+        </section>
+        <section class="left fragments">
+          <h3>MNIST - Distorted</h3><img src="img/mnist_distorted.png">
+          <p class="fragment">Demonstrates resilience to distorsions</p>
+        </section>
+        <section class="left fragments">
+          <h3>MNIST - Addition</h3><img src="img/mnist_addition.png">
+          <p class="fragment">Uses parallel STNs</p>
+          <p class="fragment">Demonstrates the capacity to model multiple objects</p>
+        </section>
+        <section class="left fragments">
+          <h3>MNIST Co-localisation</h3>
+          <ul>
+            <li class="fragment">Given a set of images that are assumed to contain instances of a common but unknown object class, localise (with a bounding box) the common object.</li>
+            <li class="fragment">Neither the object class labels, nor the object location ground truth is used for optimisation, only the set of images.</li>
+          </ul>
+        </section>
+        <section class="left">
+          <h3>MNIST Co-localisation</h3><img src="img/mnist_colocalisation.png">
+          <ul>
+            <li>Encoding function $e()$ is a CNN trained with the distorted MNIST set </li>
+            <li>Hinge loss to enforce the distance between two outputs of the ST to be less than the distance to a random crop </li>
+          </ul>
+        </section>
+        <section data-background-video="/media/arxivSTmovie.m4v" data-background="#FFF"></section>
+      </div>
+    </div>
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+    <script type="text/javascript">
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        mouseWheel: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true },
+          { src: 'plugin/math/math.js', async: true },
+          { src: 'plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+  </body>
+</html>

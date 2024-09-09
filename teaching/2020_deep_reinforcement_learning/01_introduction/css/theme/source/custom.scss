@@ -1,0 +1,119 @@
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+
+// Include theme-specific fonts
+@import url(../../lib/font/league-gothic/league-gothic.css);
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
+
+
+// Override theme settings (see ../template/settings.scss)
+$heading1Size: 2.488em;
+$heading2Size: 2.074em;
+$heading3Size: 1.728em;
+$heading4Size: 1.44em;
+
+$mainFont:                  'Raleway', 'Roboto', 'Arial', sans;
+$headingFont:               'Spectral', 'Book Antiqua', Palatino, FreeSerif, serif;
+$headingTextShadow:         none;
+$headingTextTransform:      none;
+$mainColor:                #000;
+$headingColor:             #383D3D;
+$backgroundColor:          #F0F1EB;
+$secondaryBackgroundColor:   darken( $backgroundColor, 20% );
+$linkColor:                #51483D;
+$linkColorHover:             lighten( $linkColor, 20% );
+$selectionBackgroundColor: #26351C;
+$alertColor:               #BD1421;
+
+
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------
+
+
+.reveal .slides {
+    text-align: left;
+}
+
+.reveal .slides img {
+    display: block;
+    margin: 15px auto;
+}
+
+
+.reveal a {
+    line-height: 1.3em;
+}
+
+
+.reveal [data-background] h1,
+.reveal [data-background] h2,
+.reveal [data-background] h3,
+.reveal [data-background] h4,
+.reveal [data-background] h5,
+.reveal [data-background] h6 {
+    color: #f4d018;
+}
+
+
+.alert{
+    font-weight: 600px;
+    font-style: italic;
+    color: $alertColor;
+    // font-family: $headingFont;
+}
+
+.cite{
+    display: block;
+    float: right;
+}
+
+
+.reveal blockquote {
+    border: none;
+    box-shadow: none;
+    border-left: 10px solid $secondaryBackgroundColor;
+    margin: 40px 0;
+    padding: 0 0 0 20px;
+    >p {
+        margin: 0
+    }
+}
+
+
+.grid {
+    /* Grid Fallback */
+    display: flex;
+    flex-wrap: wrap;
+
+    /* Supports Grid */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-auto-rows: minmax(150px, auto);
+    grid-gap: 1em;
+}
+
+.grid_item {
+    /* Demo-Specific Styles */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    //   height: 200px;
+  
+    /* Flex Fallback */
+    margin-left: 5px;
+    margin-right: 5px;
+    flex: 1 1 200px;
+}
+
+/* If Grid is supported, remove the margin we set for the fallback */
+@supports (display: grid) {
+    .grid_item {
+        margin: 0;
+    }
+}
